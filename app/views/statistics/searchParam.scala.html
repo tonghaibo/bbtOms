@@ -1,0 +1,15 @@
+@()@searchParam() = @{
+    var href = "?"
+    var between = request().getQueryString("between")
+    
+    if(between != "" && between != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "between=" + between
+    }
+    if(href != "?"){
+        href += "&"
+    }
+    href
+}@searchParam()

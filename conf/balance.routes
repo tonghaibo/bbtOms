@@ -1,0 +1,6 @@
+#处理balancewithdraw
+GET    /balanceWithdrawManage           			controllers.balance.BalanceOmsController.balanceWithdrawManage()
+GET    /changeBalanceWithdrawSta           			controllers.balance.BalanceOmsController.changeBalanceWithdrawSta()
+GET    /backBalanceWithdraw           				controllers.balance.BalanceOmsController.backBalanceWithdraw()
+GET    /piliangChangeBalanceWithdrawSta           	controllers.balance.BalanceOmsController.piliangChangeBalanceWithdrawSta()
+GET    /exportBalanceWithdraw           			controllers.balance.BalanceOmsController.exportBalanceWithdraw()

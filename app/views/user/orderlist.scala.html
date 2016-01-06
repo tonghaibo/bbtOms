@@ -1,0 +1,104 @@
+@(orderlist:List[models.order.PostOrder])(sign:models.wx.WxSign)(openid:String)
+@views.html.usermain {
+<!-- css -->
+<title>棒棒糖生活</title>
+}{
+<!-- content -->
+<div class="container">
+
+            <div class="order-list">
+
+@if(orderlist!=null){
+              <ul>
+@for(order <- orderlist){
+
+               <ol class="bordercorol@order.getStatus()" onclick="javascript:window.location.href='/user/orderdetail?orderid=@order.getId()';">
+
+                    <div class="order-state">
+
+                        <em class="fl">快递订单<font class="fontcolor">(个人)</font></em>
+
+                        <span class="fr">@assets.CdnAssets.formatordersta(order.getStatus())</span>
+
+                    </div>
+
+                    <div class="order-address">
+
+                        <ul class="order-address-info order-address-distance">
+
+                           <li>
+
+                              <p>@order.getAddress()</p>
+
+                              <em>
+
+                                <br>
+
+                                
+
+                              </em>
+
+                           </li>   
+
+                           <li>
+
+                              <p>@order.getReceiveaddress()</p>
+
+                              <em>
+
+                                距收件<br>
+
+                                @(order.getDistance().toDouble/1000)km
+
+                              </em>
+
+                           </li>             
+
+                        </ul>
+
+                        <div class="order-address-ico">
+
+                           <i class="ico-send"></i>
+
+                           <em></em>
+
+                           <i class="ico-income"></i>
+
+                        </div>
+
+                    </div>
+@if(order.getStatus()>3){
+                    <div class="order-tel">
+
+                        <em class="fl">联系快递员</em>
+
+                        <span class="fr"><a href="tel:@if(order.getPostman()!=null){@order.getPostman().getPhone()}"><i class="ico-tel"></i>@if(order.getPostman()!=null){@order.getPostman().getPhone()}</a></span>
+
+                    </div>
+}
+                 </ol> 
+}
+              </ul>
+}
+            </div>
+
+        </div>  
+}{
+<!-- javascript -->
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/count.js")"></script>
+ <script>
+ var counturl = location.href.split('#')[0];
+
+ 	jQuery(function($){
+ 		var url = 'http://chaxun.1616.net/s.php?type=ip&output=json&callback=?&_='+Math.random(); 
+ 		$.getJSON(url, function(data){	
+ 			//添加统计
+ 			addcountwx(data.Ip,counturl,'bbt_samecity','@openid');
+ 		});
+ 	});
+ </script>
+<script>
+//微信分享
+wxshare('@sign.getAppId()','@sign.getTimstr()','@sign.getNostr()','@sign.getSign()','@sign.getSharetitle()','@sign.getSharecontent()','@sign.getShareimg()','@sign.getShareurl()',false);
+</script>
+}

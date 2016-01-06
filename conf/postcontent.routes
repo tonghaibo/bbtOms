@@ -1,0 +1,13 @@
+GET    /postcontentManage           			controllers.postcontent.PostcontentController.postcontentManage()
+GET    /newOrUpdatePostcontent           		controllers.postcontent.PostcontentController.newOrUpdatePostcontent()
+POST   /savePostcontent           				controllers.postcontent.PostcontentController.savePostcontent()
+POST   /savenewsPostcontent           			controllers.postcontent.PostcontentController.savenewsPostcontent()
+GET    /changePostcontentSta           			controllers.postcontent.PostcontentController.changePostcontentSta()
+POST   /uploadPostcontentImg           			controllers.postcontent.PostcontentController.uploadPostcontentImg()
+GET    /deletePostcontentImg/:imageId          	controllers.postcontent.PostcontentController.deletePostcontentImg(imageId:Long)
+
+#翻牌任务设置
+GET    /postRewardManage          				controllers.postcontent.PostRewardController.postRewardManage
+GET    /newOrUpdatePostReward          			controllers.postcontent.PostRewardController.newOrUpdatePostReward
+POST   /savePostReward          				controllers.postcontent.PostRewardController.savePostReward
+GET    /changePostRewardFlg          			controllers.postcontent.PostRewardController.changePostRewardFlg

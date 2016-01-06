@@ -1,0 +1,269 @@
+@(postmanUserPage : com.avaje.ebean.PagedList[models.postman.PostmanUser])(postmanUserStas:Html)(postcompanys:Html)
+@import utils.Dates
+@import play.Configuration
+@import utils.Constants.PostmanStatus
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		资质审核
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchPostmanUserForm" name="searchPostmanUserForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3">
+                  <label>快递公司</label>
+                  <select id="companyid" name="companyid" class="form-control">
+                  	@postcompanys
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                  <label>状态</label>
+                  <select id="sta" name="sta" class="form-control">
+                  	@postmanUserStas
+                  </select>
+                </div>
+                <div class="col-xs-3" >
+                  <label>关键字</label>
+                  <input id="keyword" name="keyword" type="text" class="form-control" placeholder="请输入姓名或手机号" value="@request().getQueryString("keyword")"/>
+                </div>
+              </div>
+              <br/> 
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="postmanUserTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>ID</th>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>身份证号</th>
+                        <th>快递公司</th>
+                        <th>分站名称</th>
+                        <th>工号</th>
+                        <th>申请时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   @if(postmanUserPage!=null && postmanUserPage.getList() != null && postmanUserPage.getList().size() > 0){
+                      @for(postmanUser <- postmanUserPage.getList()){
+                          <tr class="h6" data-uid="@postmanUser.getId()">
+                              <td><input type="checkbox" value="@postmanUser.getId()" name="puid" ></td>
+                              <td>@postmanUser.getId()</td>
+                              <td>@postmanUser.getNickname()</td>
+                              <td>@postmanUser.getPhone()</td>
+                              <td>@postmanUser.getCardidno()</td>
+                              <td>@postmanUser.getCompanyname()</td>
+                              <td>@postmanUser.getSubstation()</td>
+                              <td>@postmanUser.getStaffid()</td>
+                              <td>@Dates.formatDateTime(postmanUser.getDateNew())</td>
+                              <td>@PostmanStatus.stas2Message(postmanUser.getSta().toInt)</td>
+                              <td>
+                              	<a class="btn btn-info" href="/postmanuser/newOrUpdatePostmanUser?id=@postmanUser.getId()">修改</a> 
+                              	<a class="btn btn-info" href="/postmanuser/userLocation/@postmanUser.getId()">位置</a>
+                                @if(postmanUser.getSta()!=null&&postmanUser.getSta()=="0"||postmanUser.getSta()=="2"){
+	                            	<a class="btn btn-warning" href="javascript:void(0);" onclick="changePostmanUserSta(@postmanUser.getId(),1)">通过</a> 
+                                }
+                                @if(postmanUser.getSta()!=null&&postmanUser.getSta()=="0"){
+	                            	<a class="btn btn-warning" href="javascript:void(0);" onclick="changePostmanUserSta(@postmanUser.getId(),2)">驳回</a> 
+                                }
+                              </td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="11">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                	<tr id="operTd">
+	                    <th colspan="16" id="selectAllTh">
+	                        <input id="selectAll" name="selectAll" type="checkbox"> <label id="selectAllLabel">全选</label> &nbsp;
+	                        <a class="btn btn-success btn-sm" href="#" title="批量通过" id="piliangOkDeal"><i class="fa fa-bolt"></i> 批量通过</a>
+	                        <a class="btn btn-danger btn-sm" href="#" title="批量驳回" id="piliangBackDeal"><i class="fa fa-bolt"></i> 批量驳回</a>
+	                    </th>
+	                </tr>
+                </tfoot>
+           		</table>
+           		@if(postmanUserPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    postmanUserPage.getPageIndex() + 1
+		                }/@postmanUserPage.getTotalPageCount() 共计@postmanUserPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(postmanUserPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (postmanUserPage.getTotalPageCount()-1)){
+                	@if(postmanUserPage.getTotalPageCount()< 8){
+                		<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(postmanUserPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == postmanUserPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == postmanUserPage.getTotalPageCount()-1){
+			               			<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(postmanUserPage.getPageIndex() < postmanUserPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > postmanUserPage.getPageIndex()-4 &&  index < postmanUserPage.getPageIndex() +5){
+							 		<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == postmanUserPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == postmanUserPage.getTotalPageCount()){
+				                		<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > postmanUserPage.getTotalPageCount()-8){
+									<li class="@if(index == postmanUserPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(postmanUserPage.getPageIndex()==postmanUserPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{postmanUserPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+$("input[type='checkbox']").iCheck({
+	checkboxClass : 'icheckbox_square-blue'
+});
+//全选
+$("#selectAll").on('ifUnchecked', function() {
+	$("input[type='checkbox']", "#postmanUserTable").iCheck("uncheck");
+}).on('ifChecked', function() {
+	$("input[type='checkbox']", "#postmanUserTable").iCheck("check");
+});
+var sta = $("#sta").val();
+if(sta=="1"){
+	$("#operTd").hide();
+}
+
+function changePostmanUserSta(id, sta){
+	if(sta==1){
+		var flagStr = confirm("请再次确认对用户资质审核通过！");
+		if(flagStr == true){
+			console.log("succeful , change sta 2");
+			window.location.href="/postmanuser/changePostmanUserSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消资质审核操作");
+			return false;
+		}	
+	}else if(sta == 2){
+		var flagStr = confirm("请再次确认对用户资质审核驳回！");
+		if(flagStr == true){
+			console.log("succeful , change sta 2");
+			window.location.href="/postmanuser/changePostmanUserSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消资质审核操作");
+			return false;
+		}	
+	}
+}
+//批量通过
+$("#piliangOkDeal").click(function(){
+	//获取所有被选中的select
+	var puids = getCheckedPostmanUserId();
+	console.log("puids:"+puids);
+	if(puids==""){
+		alert("请选择相应的用户信息！");
+		return false;
+	}
+	var flag = confirm("请再次确认批量审核通过所选用户！");
+	if(flag == true){
+		window.location.href="/postmanuser/piliangChangePostmanUserSta?puids="+puids+"&sta="+1;
+	}else{
+		return false;
+	}
+})
+//批量驳回
+$("#piliangBackDeal").click(function(){
+	//获取所有被选中的select
+	var puids = getCheckedPostmanUserId();
+	console.log("puids:"+puids);
+	if(puids==""){
+		alert("请选择相应的用户信息！");
+		return false;
+	}
+	var flag = confirm("请再次确认批量审核驳回所选用户！");
+	if(flag == true){
+		window.location.href="/postmanuser/piliangChangePostmanUserSta?puids="+puids+"&sta="+2;
+	}else{
+		return false;
+	}
+})
+//获取选中的sopid 集合
+function getCheckedPostmanUserId(){
+	var array = new Array();
+	$("input[name = 'puid']:checkbox").each(function () {
+		if(true==$(this).prop("checked")||"checked"==$(this).prop("checked")){
+			array.push($(this).val());
+		}
+	});
+	return array.join(",");
+}
+</script>
+}

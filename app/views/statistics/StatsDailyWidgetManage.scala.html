@@ -1,0 +1,161 @@
+@(statsDailyWidgetPage : com.avaje.ebean.PagedList[models.statistics.StatDailyWidget])(formPage : form.StatsDailyForm)
+@import views.html.statistics.searchParam
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		Widget数据
+	</h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchForm" name="searchForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3" >
+                  <label>统计日期</label>
+					<input id="between" name="between" type="text" class="form-control" placeholder="请选择统计时间" readonly value='@formPage.between'/>
+                </div>
+              </div>
+              <br/>
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="StatsDailyWidgetManage" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>统计日期</th>
+                        <th>日曝光PV</th>
+                        <th>日曝光UV</th>
+                        <th>日点击PV</th>
+                        <th>日点击UV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   @if(statsDailyWidgetPage!=null && statsDailyWidgetPage.getList() != null && statsDailyWidgetPage.getList().size() > 0){
+                      @for(statsDailyWidget <- statsDailyWidgetPage.getList()){
+                          <tr class="h6" data-uid="@statsDailyWidget.getId()">
+                              <td>@statsDailyWidget.getStatDate()</td>
+                              <td>@statsDailyWidget.getPv()</td>
+                              <td>@statsDailyWidget.getUv()</td>
+                              <td>@statsDailyWidget.getClickPv()</td>
+                              <td>@statsDailyWidget.getClickUv()</td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="10">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(statsDailyWidgetPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    statsDailyWidgetPage.getPageIndex() + 1
+		                }/@statsDailyWidgetPage.getTotalPageCount() 共计@statsDailyWidgetPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+
+		                     @if(statsDailyWidgetPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+
+                @for(index<- 0 to (statsDailyWidgetPage.getTotalPageCount()-1)){
+                	@if(statsDailyWidgetPage.getTotalPageCount()< 8){
+                		<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(statsDailyWidgetPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == statsDailyWidgetPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == statsDailyWidgetPage.getTotalPageCount()-1){
+			               			<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{
+							@if(statsDailyWidgetPage.getPageIndex() < statsDailyWidgetPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > statsDailyWidgetPage.getPageIndex()-4 &&  index < statsDailyWidgetPage.getPageIndex() +5){
+							 		<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == statsDailyWidgetPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == statsDailyWidgetPage.getTotalPageCount()){
+				                		<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > statsDailyWidgetPage.getTotalPageCount()-8){
+									<li class="@if(index == statsDailyWidgetPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}
+                      }
+                      @if(statsDailyWidgetPage.getPageIndex()==statsDailyWidgetPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{statsDailyWidgetPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+    <script type="text/javascript">
+    $("#between").daterangepicker({
+    locale: {
+    applyLabel: '确定',
+    cancelLabel: '取消',
+    fromLabel: '开始',
+    toLabel: '结束',
+    weekLabel: 'W',
+    customRangeLabel: 'Custom Range',
+    showDropdowns: true
+    },
+    format: 'YYYY/MM/DD'
+    });
+    </script>
+}

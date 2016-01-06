@@ -1,0 +1,257 @@
+@(sign:models.wx.WxSign)(sharesign:models.wx.WxSign)(openid:String)
+@views.html.usermain {
+<!-- css -->
+<title>棒棒糖生活</title>
+}{
+<!-- content -->
+<div class="container">
+
+            <div class="content content-m-t"> 
+
+                <ul class="order-top">
+
+                   <li>
+
+                      总价
+
+                      <p><b>1</b>元</p>
+
+                   </li>
+
+                   <li>
+
+                      距离
+
+                      <p><b id="distance">0</b>公里</p>
+
+                   </li>
+
+                   <li>
+
+                      重量
+
+                      <p><b id="weight"></b>公斤及以下</p>
+
+                   </li>
+
+                </ul>
+
+            </div>
+
+            <div class="content content-m-t10">
+
+                <div class="order-address">
+
+                    <ul class="order-address-info order-address-readonly">
+
+                       <li>
+
+                          <p id="sendaddress"></p>
+
+                       </li>   
+
+                       <li>
+
+                          <p id="receiveaddress"></p>
+
+                       </li>             
+
+                    </ul>
+
+                    <div class="order-address-ico">
+
+                       <i class="ico-send"></i>
+
+                       <em></em>
+
+                       <i class="ico-income"></i>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="content content-m-t10">
+
+               <div class="row row-b-b sender">
+
+                   <input class="input" type="text" id="sendername" name="sendername" placeholder="寄件人姓名"/>
+
+                   <input class="input" type="tel" id="senderphone" name="senderphone" placeholder="寄件人电话"/>
+
+               </div>
+
+               <div class="row sender">
+
+                   <input class="input" type="text" id="receivername" name="receivername" placeholder="收件人姓名"/>
+
+                   <input class="input" type="tel" id="receiverphone" name="receiverphone" placeholder="收件人电话"/>
+
+               </div>
+
+            </div>
+
+            <div class="content content-m-t10">
+
+               <div class="row">
+
+                  <div class="fl fontcolor">
+
+                     取件时间
+
+                  </div>
+
+                  <div class="fr" id=taketim>
+                   </div>
+
+               </div>
+
+            </div>
+
+            <div class="content content-m-t10">
+
+               <div class="row row-b-b goods">
+
+                   <label>物品名称：</label>
+
+                   <input class="input" type="text" id="subjectname" name="subjectname" placeholder="必填"/>
+
+               </div>
+
+               <div class="row goods">
+
+                   <label>备注信息：</label>
+
+                   <input class="input" type="text" id="remark" name="remark" placeholder="选填"/>
+
+               </div>
+
+            </div>
+
+            <div class="content content-m-t10">
+
+               <div class="row">
+
+                  <label class="fl fontcolor">
+
+                     还需支付：
+
+                  </label>
+
+                  <div class="fr need-freight">
+
+                     <b>30</b>元
+
+                   </div>
+
+               </div>
+
+            </div>
+
+            <div class="btn-wrap fixed">
+
+               <button class="btn" disabled onclick="senderorder()">发送订单</button>
+
+            </div>
+
+        </div>
+}{
+<!-- javascript -->
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/count.js")"></script>
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/address.js")"></script>
+ <script>
+
+ $("#sendaddress").html(address('addresser','addresserAddress'));//发件人
+ $("#receiveaddress").html(address('addressee','addresseeAddress'));//收件人
+
+ //计算公里数
+var sid=window.localStorage.getItem("sid");
+var rid=window.localStorage.getItem("rid");
+
+//alert(sid);
+var distance=0;
+var weight=window.localStorage.getItem("count");
+
+	
+$("#weight").html(window.localStorage.getItem("count"));
+var timstr=window.localStorage.getItem("taketim");
+if(timstr==null || timstr=='0')
+	timstr='立即取件';
+else if(timstr.charAt(0)=='t')
+	timstr='明天'+timstr+'时';
+else
+	timstr=timstr+'时';
+//alert(timstr);	
+$("#taketim").html(timstr);
+ $.ajax({
+         type:"GET",
+         url:"/user/getdistance?sid="+sid+"&rid="+rid,
+         datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+         beforeSend:function(){},  
+         success:function(data){                           
+         	$("#distance").html(data.d);
+         	window.localStorage.setItem("distance",data.d);
+         	distance=data.d;
+         	//alert(distance);
+          }   ,
+         complete: function(XMLHttpRequest, textStatus){
+         },
+         error: function(){
+             //_alert("发送失败!");
+         }        
+      	}); 
+ var counturl = location.href.split('#')[0];
+
+ 	jQuery(function($){
+ 		var url = 'http://chaxun.1616.net/s.php?type=ip&output=json&callback=?&_='+Math.random(); 
+ 		$.getJSON(url, function(data){	
+ 			//添加统计
+ 			addcountwx(data.Ip,counturl,'bbt_samecity','@openid');
+ 		});
+ 	});
+ </script>
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/checkform.js")"></script>
+<script>
+$('input,textarea').on('change',function(){
+	formData(['sendername','senderphone','receivername','receiverphone','subjectname']);
+	})
+	$('button.btn').on('click',function(){
+	formData(['sendername','senderphone','receivername','receiverphone','subjectname']);
+	})
+function senderorder(){
+	var receivername=document.getElementById("receivername").value;
+	var receiverphone=document.getElementById("receiverphone").value;
+	var senderphone=document.getElementById("senderphone").value;
+	var sendername=document.getElementById("sendername").value;
+	var subjectname=document.getElementById("subjectname").value;
+	var remark=document.getElementById("remark").value;
+	$.ajax({
+         type:"POST",
+         url:"/user/saveorder",
+         data:{sid:sid,rid:rid,taketim:window.localStorage.getItem("taketim"),count:window.localStorage.getItem("count"),sendername:sendername,senderphone:senderphone,receivername:receivername,receiverphone:receiverphone,subjectname:subjectname,remark:remark},
+         datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+         beforeSend:function(){},  
+         success:function(data){                           
+         	if(data.orderid>0){
+         		//微信支付
+         		@if(sign.getAccess_token()==""){
+         			var u=encodeURI("http://h5dev.higegou.com/user/orderwxpay?orderid="+data.orderid);			          						   				          						        
+	          		window.location.href="https://open.weixin.qq.com/connect/oauth2/authorize?appid=@sign.getAppId()&redirect_uri="+u+"&response_type=code&scope=snsapi_base&state=123&connect_redirect=1#wechat_redirect";
+         		}else{
+         			var u="/user/orderwxpay?orderid="+data.orderid;
+	          		window.location.href=u;
+         		}
+         	}
+          }   ,
+         complete: function(XMLHttpRequest, textStatus){
+         },
+         error: function(){
+             //_alert("发送失败!");
+         }        
+      	});  
+}
+//微信分享
+wxshare('@sharesign.getAppId()','@sharesign.getTimstr()','@sharesign.getNostr()','@sharesign.getSign()','@sharesign.getSharetitle()','@sharesign.getSharecontent()','@sharesign.getShareimg()','@sharesign.getShareurl()',false);
+</script>
+}

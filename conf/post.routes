@@ -1,0 +1,18 @@
+#寄件人收件人
+GET   		/userAddressManage                controllers.post.UserAddressController.userAddressManage()
+GET   		/newOrUpdateUserAddress           controllers.post.UserAddressController.newOrUpdateUserAddress()
+POST   		/saveUserAddress           		  controllers.post.UserAddressController.saveUserAddress()
+GET   		/delUserAddress           		  controllers.post.UserAddressController.delUserAddress()
+GET   		/getUserAddress/:userAddressId    controllers.post.UserAddressController.getUserAddress(userAddressId : Integer)
+
+#同城订单
+GET   		/postOrderManage           		  controllers.post.PostOrderController.postOrderManage()
+GET   		/newOrUpdatePostOrder             controllers.post.PostOrderController.newOrUpdatePostOrder()
+POST   		/savePostOrder             		  controllers.post.PostOrderController.savePostOrder()
+GET   		/delPostOrder           		  controllers.post.PostOrderController.delPostOrder()
+GET   		/cancelPostOrder           		  controllers.post.PostOrderController.cancelPostOrder()
+
+#商户余额
+GET   		/userBalanceLogManage             controllers.post.UserBalanceController.userBalanceLogManage()
+GET   		/newOrUpdateUserBalance           controllers.post.UserBalanceController.newOrUpdateUserBalance()
+POST   		/saveUserBalance             	  controllers.post.UserBalanceController.saveUserBalance()

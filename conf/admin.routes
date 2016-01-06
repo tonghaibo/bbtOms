@@ -1,0 +1,14 @@
+GET    /                           				@controllers.admin.AdminController.index
+GET    /main                           			@controllers.admin.AdminController.main
+POST   /                           				@controllers.admin.AdminController.index
+GET    /users                      				@controllers.admin.AdminController.users
+GET    /users/:id                      			@controllers.admin.AdminController.getAdminUser(id: Long)
+POST   /saveUser                           		@controllers.admin.AdminController.saveUser
+POST   /users/updateAdminStatus                 @controllers.admin.AdminController.updateAdminStatus
+GET    /adminUserListBatchForJson               @controllers.admin.AdminController.adminUserListBatchForJson
+GET    /login                      				@controllers.admin.AdminController.login
+GET    /logout                     				@controllers.admin.AdminController.logout
+
+
+
+

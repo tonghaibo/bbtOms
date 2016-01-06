@@ -1,0 +1,43 @@
+@()@searchParam() = @{
+    var href = "?"
+    var companyid = request().getQueryString("companyid")
+    var sta = request().getQueryString("sta")
+    var nickname = request().getQueryString("nickname")
+    var phone = request().getQueryString("phone")
+    var keyword = request().getQueryString("keyword")
+    
+    if(companyid != "" && companyid != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "companyid=" + companyid
+    }
+    if(sta != "" && sta != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "sta=" + sta
+    }
+    if(nickname != "" && nickname != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "nickname=" + nickname
+    }
+    if(phone != "" && phone != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "phone=" + phone
+    }
+    if(keyword != "" && keyword != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "keyword=" + keyword
+    }
+    if(href != "?"){
+        href += "&"
+    }
+    href
+}@searchParam()

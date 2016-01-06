@@ -1,0 +1,168 @@
+@(flag:String)(sid:String)(rid:String)(sign:models.wx.WxSign)@views.html.usermain {
+<!-- css -->
+<title>棒棒糖生活</title>
+}{
+<!-- content -->
+<div class="container" id="address-list">
+<form name="form1" id="form1" action="/user/saveaddress" method="post">
+<input type="hidden" id="flag" name="flag" value="@flag" />
+<input type="hidden" id="sid" name="sid" value="@sid" />
+<input type="hidden" id="rid" name="rid" value="@rid" />
+            <div class="content content-m-t">
+
+                <ul class="address-list">
+
+                   <li>
+
+                      <input class="input" type="text" placeholder="选择省份" id="provin" name="provin" value="河北省" readonly/>
+
+                   </li>
+
+                   <li>
+
+                      <input class="input" type="text" id="city" name="city" value="石家庄" readonly/>
+
+                   </li>
+
+                   <li>
+
+                      <input class="input" type="text" id="country" name="country" placeholder="选择区县" readonly/>
+
+                      <i class="ico-next"></i>
+
+                   </li>
+
+                   <li>
+
+                      <textarea class="textarea" id="address" name="address" placeholder="输入详细地址（街道门牌号）"></textarea>
+
+                   </li>
+
+                </ul>
+
+            </div>
+
+            <div class="btn-wrap fixed">
+
+               <button class="btn" id="submit1" name="submit1" onclick="submitform()" disabled>保存</button>
+
+            </div>
+
+	</form>
+        </div>
+
+        <div class="container" id="countylist" style="display:none;">
+
+            <div class="content content-b">
+
+                <ul class="city-list">
+
+                   <li>
+
+                      <i class="ico-yes-off ico-yes-on"></i>北京市
+
+                   </li>   
+
+                   <li>
+
+                      <i class="ico-yes-off"></i>天津市
+
+                   </li>   
+
+                   <li>
+
+                      <i class="ico-yes-off"></i>上海市
+
+                   </li>               
+
+                </ul>
+
+            </div>
+
+            <div class="btn-wrap fixed">
+
+               <button class="btn" id="citybtn" name="citybtn" disabled>选&nbsp;择</button>
+
+            </div>
+       </div>  
+}{
+<!-- javascript -->
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/address.js")"></script>
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/checkform.js")"></script>
+<script>
+var data = [{"Code": 86141111, "Name": "\u957f\u5b89\u533a"}, {"Code": 86141131, "Name": "\u9ad8\u9091\u53bf"}, {"Code": 86141121, "Name": "\u85c1\u57ce\u5e02"}, {"Code": 86141120, "Name": "\u664b\u5dde\u5e02"}, {"Code": 86141115, "Name": "\u4e95\u9649\u77ff\u533a"}, {"Code": 86141125, "Name": "\u4e95\u9649\u53bf"},{"Code": 86141130, "Name": "\u7075\u5bff\u53bf"}, {"Code": 86141118, "Name": "\u9e7f\u6cc9\u5e02"}, {"Code": 86141128, "Name": "\u683e\u57ce\u53bf"},{"Code": 86141122, "Name": "\u5e73\u5c71\u53bf"}, {"Code": 86141112, "Name": "\u6865\u4e1c\u533a"}, {"Code": 86141113, "Name": "\u6865\u897f\u533a"}, {"Code": 86141132, "Name": "\u6df1\u6cfd\u53bf"}, {"Code": 86141123, "Name": "\u65e0\u6781\u53bf"}, {"Code": 86141119, "Name": "\u8f9b\u96c6\u5e02"}, {"Code": 86141114, "Name": "\u65b0\u534e\u533a"}, {"Code": 86141117, "Name": "\u65b0\u4e50\u5e02"}, {"Code": 86141129, "Name": "\u884c\u5510\u53bf"}, {"Code": 86141116, "Name": "\u88d5\u534e\u533a"}, {"Code": 86141124, "Name": "\u5143\u6c0f\u53bf"}, {"Code": 86141133, "Name": "\u8d5e\u7687\u53bf"}, {"Code": 86141127, "Name": "\u8d75\u53bf"}, {"Code": 86141126, "Name": "\u6b63\u5b9a\u53bf"}];
+var datalen = data.length;
+var html = '';
+for (var i = 0; i < datalen; i++){
+	  html += '<li data-value="' + data[i].Name + '" data-code = ' + i  + '><i class="ico-yes-off"></i>' + data[i].Name + '</li>'
+}
+var addressee = {
+		 provin : '河北省',
+		 city : '石家庄',
+		 country : '',
+		 countrycode :''			 
+	  }
+$('.city-list').html(html);
+$('.input:eq(2)').click(function(){
+	   var _this = $(this);
+	   var index = $(this).attr('data-code');
+	   $('.city-list li').eq(index).find('i').addClass('ico-yes-on');
+	   $('#address-list').hide();
+	   $('#countylist').show();
+	   $('.city-list li').click(function(){
+		   var val = $(this).attr('data-value');
+		   var code = $(this).attr('data-code');
+		   $('.city-list li').find('i').removeClass('ico-yes-on');
+		   $(this).find('i').addClass('ico-yes-on');
+		   $('#citybtn').prop('disabled',false);
+		   $('#citybtn').click(function(){
+			   _this.val(val);
+			   _this.attr('data-code',code);
+			   addressee.country = val;
+			   addressee.countrycode = code;
+			   if($('#flag').val() == '1'){
+				  window.localStorage.setItem('addresser',JSON.stringify(addressee));
+			   } else {
+				   window.localStorage.setItem('addressee',JSON.stringify(addressee));
+			   }
+			   $('#address-list').show();
+	   		   $('#countylist').hide();
+		   })
+	   })
+ })
+$('button.btn').on('click',function() {
+	formData(['country', 'address']);
+})	
+$('#address').on('change keydown keyup',function() {
+	  formData(['country', 'address']);
+	  if($('#flag').val() == '1'){
+		  window.localStorage.setItem('addresserAddress',$(this).val());
+	   } else {
+		  window.localStorage.setItem('addresseeAddress',$(this).val());
+	   }
+}) 
+var addresseeJSON,country,countrycode,addresseeAddress;
+if($('#flag').val() == '1'){
+	addresseeJSON = get_Itemjson('addresser');
+	country = $.parseJSON(addresseeJSON).country;	
+	countrycode = $.parseJSON(addresseeJSON).countrycode;	
+	addresseeAddress = get_Item('addresserAddress'); 
+} else {
+	addresseeJSON = get_Itemjson('addressee');
+	country = $.parseJSON(addresseeJSON).country;	
+	countrycode = $.parseJSON(addresseeJSON).countrycode;	
+  addresseeAddress = get_Item('addresseeAddress');
+}
+if(country){
+	 $('#country').val(country);
+	 $('#country').attr('data-code',countrycode)
+}
+if(addresseeAddress){
+	 $('#address').val(addresseeAddress);
+}
+formData(['country', 'address']);
+
+//微信分享
+wxshare('@sign.getAppId()','@sign.getTimstr()','@sign.getNostr()','@sign.getSign()','@sign.getSharetitle()','@sign.getSharecontent()','@sign.getShareimg()','@sign.getShareurl()',false);
+       </script> 
+}

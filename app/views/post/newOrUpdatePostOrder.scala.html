@@ -1,0 +1,358 @@
+@(id:Int)(postOrder : models.order.PostOrder)(userAddressesHtml:Html)(receiveUserAddressesHtml:Html)
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		同城订单信息<small>@if(id == 0){新建}@if(id > 0){修改}</small>
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="tab-content" style="height:800px;">
+			<form role="form" action="/post/savePostOrder" method="post" id="postOrderForm" >
+              	 <input type="hidden" id="id" name="id" value="@id">
+                 <div class="box-body">
+                 	<div class="row">
+                  		<div class="col-xs-2">
+							<label ><font size="+1">寄件信息:</font></label>
+							<select id="sender" name="sender" class="form-control">
+								@userAddressesHtml
+							</select>
+						</div>
+                   </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>寄件人姓名:</label>
+							<input type="text" class="form-control" id="username" name="username" value="@if(postOrder==null){}else{@postOrder.getUsername()}">
+							<p class="help-block" id="usernameP" style="display:none;">请输入寄件人姓名</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>手机号:</label>
+							<input type="text" class="form-control" id="phone" name="phone" value="@if(postOrder==null){}else{@postOrder.getPhone()}" maxlength="11" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+							<p class="help-block" id="phoneP" style="display:none;">请输入寄件人手机号</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-xs-4">
+						<label>地址:</label>
+							@if(id==0){
+			                <div id="city_4">
+	                            <select class="prov" name="prov"></select> 
+	                            <select class="city" name="city" disabled="disabled"></select>
+	                            <select class="dist" name="dist" disabled="disabled"></select>
+	                        </div>
+		                    <input id="province" name="province" placeholder="请输入省市区" type="hidden" class="form-control" value=""/>
+		                   }
+						   <input id="address" name="address" placeholder="请选择寄件地址" type="text" value="@if(id==0||postOrder==null){}else{@postOrder.getAddress()}" class="form-control" />
+							<p class="help-block" id="addressP" style="display:none;">请输入寄件人详细地址</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>货物重量（斤）:</label>
+							<input type="text" class="form-control" id="weight" name="weight" value="@if(postOrder==null){}else{@postOrder.getWeight()}">
+							<p class="help-block" id="weightP" style="display:none;">请选择货物重量</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>总价（元）:</label>
+							<input type="text" class="form-control" id="totalfee" name="totalfee" value="@if(postOrder==null){}else{@postOrder.getTotalfee()}">
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>备注:</label>
+							<input type="text" class="form-control" id="subjectremark" name="subjectremark" value="@if(postOrder==null){}else{@postOrder.getSubjectremark()}">
+							<p class="help-block" id="subjectremarkP" style="display:none;">请输入物品备注</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>期望上门取件时间:</label>
+							<label for="agent"><input class="radioItem" type="radio" name="gettyp" id="gettypRadios1" value="1"/>立即取件</label>
+				    		<label for="agent"><input class="radioItem" type="radio" name="gettyp" id="gettypRadios2" value="2"/>其他时间</label>
+							<input type="text" class="form-control" id="gettime" name="gettime" value="@if(postOrder==null){}else{@postOrder.getGettime()}" style="display: none;">
+							<p class="help-block" id="gettimeP" style="display:none;">请输入期望上门取件时间</p>
+	                    </div>
+                    </div>
+                    <hr/>
+                    <div class="row">
+                  		<div class="col-xs-2">
+							<label><font size="+1">收件信息:</font></label>
+							<select id="receiver" name="receiver" class="form-control">
+								@receiveUserAddressesHtml:Html
+							</select>
+						</div>
+                   </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>收件人姓名:</label>
+							<input type="text" class="form-control" id="receivename" name="receivename" value="@if(postOrder==null){}else{@postOrder.getReceivename()}">
+							<p class="help-block" id="receivenameP" style="display:none;">请输入收件人姓名</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>手机号:</label>
+							<input type="text" class="form-control" id="receivephone" name="receivephone" value="@if(postOrder==null){}else{@postOrder.getReceivephone()}" maxlength="11" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+							<p class="help-block" id="receivephoneP" style="display:none;">请输入收件人手机号</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-xs-4">
+						<label>地址:</label>
+							@if(id==0){
+			                <div id="city_5">
+	                            <select class="prov" name="provreceive"></select> 
+	                            <select class="city" name="cityreceive" disabled="disabled"></select>
+	                            <select class="dist" name="distreceive" disabled="disabled"></select>
+	                        </div>
+		                   <input id="provincereceive" name="provincereceive" placeholder="请输入省市区" type="hidden" class="form-control" value=""/>
+		                   }
+						   <input id="receiveaddress" name="receiveaddress" placeholder="请选择收件地址" value="@if(id==0||postOrder==null){}else{@postOrder.getReceiveaddress()}" type="text" class="form-control" />
+							<p class="help-block" id="receiveaddressP" style="display:none;">请输入收件人详细地址</p>
+	                    </div>
+                    </div>
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="savePostOrderBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+               <div id="allmap" style="width: 600px;height: 600px;"></div>
+            </div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<script type="text/javascript" src="/public/javascripts/jquery.cityselect.js"></script>
+<script type="text/javascript">
+$("#city_4").citySelect({
+  prov:"北京", 
+  city:"朝阳区", 
+  dist:"",
+    nodata: "none"
+}); 
+$("#city_5").citySelect({
+  prov:"北京", 
+  city:"朝阳区", 
+  dist:"",
+    nodata: "none"
+}); 
+$('#gettime').datetimepicker({
+	autoclose:true,
+	format:"yyyy-mm-dd hh:ii:ss",
+	todayBtn:true
+});
+//保存寄件详情
+//提交表单，保存商品信息
+$("#savePostOrderBtn").click(function(){
+	var flag = true;
+	var username = $('[name="username"]').val();
+	var phone = $('[name="phone"]').val();
+	var address = $('[name="address"]').val();
+	var weight = $('[name="weight"]').val();
+	var totalfee = $.trim($('[name="totalfee"]').val());
+	var subjectremark = $.trim($('[name="subjectremark"]').val());
+	var gettyp = $.trim($('[name="gettyp"]:checked').val());
+	var gettime = $.trim($('[name="gettime"]').val());
+	var receivename = $.trim($('[name="receivename"]').val());
+	var receivephone = $.trim($('[name="receivephone"]').val());
+	var receiveaddress = $.trim($('[name="receiveaddress"]').val());
+	var prov = $("[name='prov']").val();
+	var city = $("[name='city']").val();
+	var dist = $("[name='dist']").val();
+	var provinceStr = prov+city;
+	if(dist!=null){
+		provinceStr += dist;
+	}
+	if($("#city_4").is(":visible")==true&&provinceStr!=null&&provinceStr!=""){
+		$("#province").val(provinceStr);
+	}else{
+		$("#province").val("");
+	}
+	var provreceive = $("[name='provreceive']").val();
+	var cityreceive = $("[name='cityreceive']").val();
+	var distreceive = $("[name='distreceive']").val();
+	var provincereceiveStr = provreceive+cityreceive;
+	if(distreceive!=null){
+		provincereceiveStr += distreceive;
+	}
+	if($("#city_5").is(":visible")==true&&provincereceiveStr!=null&&provincereceiveStr!=""){
+		$("#provincereceive").val(provincereceiveStr);
+	}else{
+		$("#provincereceive").val("");
+	}
+	if(gettyp==""||typeof(gettyp)=='undefined'||gettyp==-1){
+		$("#gettypP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#gettypP").attr("style","display:none");
+	}
+	if(username==""||username=="-1"){
+		$("#usernameP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#usernameP").attr("style","display:none");
+	}
+	if(phone==""){
+		$("#phoneP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#phoneP").attr("style","display:none");
+	}
+	if(address==""){
+		$("#addressP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#addressP").attr("style","display:none");
+	}
+	if(weight==""){
+		$("#weightP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#weightP").attr("style","display:none");
+	}
+	if(totalfee==""){
+		$("#totalfeeP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#totalfeeP").attr("style","display:none");
+	}
+	if(subjectremark==""){
+		$("#subjectremarkP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#subjectremarkP").attr("style","display:none");
+	}
+	if(gettime==""){
+		$("#gettimeP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#gettimeP").attr("style","display:none");
+	}
+	if(receivename==""){
+		$("#receivenameP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#receivenameP").attr("style","display:none");
+	}
+	if(receivephone==""){
+		$("#receivephoneP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#receivephoneP").attr("style","display:none");
+	}
+	if(receiveaddress==""){
+		$("#receiveaddressP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#receiveaddressP").attr("style","display:none");
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#postOrderForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+$("#sender").change(function(){
+	var senderId = $("[name='sender'] option:selected").val();
+	console.log(senderId);
+	if(senderId!=""&&typeof(senderId)!="undefined"&&senderId!="-1"){
+		$.ajax({
+	        url: '/post/getUserAddress/' +senderId ,
+	        type: 'GET',
+	        cache: false,
+	        dataType: "json",
+	        data: {},
+	        success: function(json){
+	        	console.log(json);
+	            if(json){
+	            	$("#username").val(json.username);
+	            	$("#phone").val(json.phone);
+	            	$("#address").val(json.address);
+	            	$("#city_4").hide();
+	            }else{
+	                alert('服务器繁忙，请稍后再试！');
+	            }
+	        },
+	        error: function(){
+	            alert('服务器繁忙，请稍后再试！');
+	        }
+	    });
+	}else{
+		$("#username").val("");
+    	$("#phone").val("");
+    	$("#address").val("");
+    	$("#city_4").show();
+	}
+})
+$("#receiver").change(function(){
+	var receiverId = $("[name='receiver'] option:selected").val();
+	console.log(receiverId);
+	if(receiverId!=""&&typeof(receiverId)!="undefined"&&receiverId!="-1"){
+		$.ajax({
+	        url: '/post/getUserAddress/' +receiverId ,
+	        type: 'GET',
+	        cache: false,
+	        dataType: "json",
+	        data: {},
+	        success: function(json){
+	        	console.log(json);
+	            if(json){
+	            	$("#receivename").val(json.username);
+	            	$("#receivephone").val(json.phone);
+	            	$("#receiveaddress").val(json.address);
+	            	$("#city_5").hide();
+	            }else{
+	                alert('服务器繁忙，请稍后再试！');
+	            }
+	        },
+	        error: function(){
+	            alert('服务器繁忙，请稍后再试！');
+	        }
+	    });
+	}else{
+		$("#receivename").val("");
+    	$("#receivephone").val("");
+    	$("#receiveaddress").val("");
+    	$("#city_5").show();
+	}
+})
+$("[name='gettyp']").change(function(){
+	var gettyp = $("[name='gettyp']:checked").val();
+	if(gettyp==2){
+		$("#gettime").show();
+		$("#gettime").val("");
+	}else{
+		var mydate = timeStamp2String();
+		$("#gettime").hide();
+		$("#gettime").val(mydate);
+	}
+})
+function timeStamp2String(){
+    var datetime = new Date();
+    var year = datetime.getFullYear();
+    var month = datetime.getMonth() + 1 < 10 ? "0" + (datetime.getMonth() + 1) : datetime.getMonth() + 1;
+    var date = datetime.getDate() < 10 ? "0" + datetime.getDate() : datetime.getDate();
+    var hour = datetime.getHours()< 10 ? "0" + datetime.getHours() : datetime.getHours();
+    var minute = datetime.getMinutes()< 10 ? "0" + datetime.getMinutes() : datetime.getMinutes();
+    var second = datetime.getSeconds()< 10 ? "0" + datetime.getSeconds() : datetime.getSeconds();
+    return year + "-" + month + "-" + date+" "+hour+":"+minute+":"+second;
+}
+</script>
+}

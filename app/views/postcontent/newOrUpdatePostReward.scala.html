@@ -1,0 +1,163 @@
+@(id:Long)(postReward : models.postcontent.PostReward)
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		翻牌任务信息<small>@if(id == 0){新建翻牌任务}@if(id > 0){修改翻牌任务}</small>
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="tab-content" style="height:800px;">
+			<form role="form" action="/postcontent/savePostReward" method="post" id="postRewardForm">
+               <input type="hidden" id="id" name="id" value="@id">
+                 <div class="box-body">
+                 	<div class="row">
+                  		<div class="col-xs-4">
+						<label>奖励类型:</label>
+				    	<label for="agent"><input type="radio" name="typ" id="typsRadios" value="1" @if(id!=0){disabled} @if(postReward!=null && postReward.getTyp()!=null && postReward.getTyp()==1){checked} />首单额外奖励</label>
+				    	<label for="agent"><input type="radio" name="typ" id="typsRadios" value="2" @if(id!=0){disabled} @if(postReward!=null && postReward.getTyp()!=null && postReward.getTyp()==2){checked} />全局奖励</label>
+				    	<label for="agent"><input type="radio" name="typ" id="typsRadios" value="3" @if(id!=0){disabled} @if(postReward!=null && postReward.getTyp()!=null && postReward.getTyp()==3){checked} />购买分成奖励</label>
+				    	<label for="agent"><input type="radio" name="typ" id="typsRadios" value="4" @if(id!=0){disabled} @if(postReward!=null && postReward.getTyp()!=null && postReward.getTyp()==4){checked} />小店关注奖励</label>
+				    	<p class="help-block" id="typP" style="display:none;">请选择翻牌奖励类型</p>
+				    </div>
+                   </div>
+                     <div class="row">
+	                    <div class="col-xs-2">
+							<label>奖励额度:</label>
+					    	<label for="agentv" style="float:right;"><input type="radio" name="commisiontyp" id="commisionsRadios" value="1" @if(postReward!=null && postReward.getCommisiontyp()!=null && postReward.getCommisiontyp()==1){checked} />金额</label>
+	                    </div>
+	                    <div class="col-xs-2">
+					    	<input type="text" class="form-control" id="commisionJine" name="commisionJine" maxlength="10" value="@if(postReward!=null&&postReward.getCommisiontyp()==1){@postReward.getCommision()}" onkeyup ="this.value=this.value.replace(/[^\d\.]/g,'')" onblur="this.value=this.value.replace(/[^\d\.]/g,'')">
+					    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-2">
+					    	<label for="agentv" style="float:right;"><input type="radio" name="commisiontyp" id="commisionsRadios" value="2"  @if(postReward!=null && postReward.getCommisiontyp()!=null && postReward.getCommisiontyp()==2){checked} />比例</label>
+	                    </div>
+	                    <div class="col-xs-2">
+					    	<label for="agentv" >100%+</label><label><input type="text" class="form-control" id="commisionBili" name="commisionBili" maxlength="10" value="@if(postReward!=null&& postReward.getCommisiontyp()==2){@postReward.getCommision()}" onkeyup ="this.value=this.value.replace(/[^\d\.]/g,'')" onblur="this.value=this.value.replace(/[^\d\.]/g,'')"></label>
+					    </div>
+                    </div>
+                    <input type="hidden" id="commision" name="commision">
+			    	<p class="help-block" id="commisiontypP" style="display:none;">请选择奖励额度方式</p>
+			    	<p class="help-block" id="commisionP" style="display:none;">请输入奖励额度</p>
+                      <div class="row">
+	                    <div class="col-xs-4">
+							<label>奖励随机比（%）:</label>
+							<input type="text" class="form-control" id="randomval" name="randomval" value="@if(postReward==null){}else{@postReward.getRandomval()}" onkeyup ="this.value=this.value.replace(/[^\d\.]/g,'')" onblur="this.value=this.value.replace(/[^\d\.]/g,'')">
+							<p class="help-block" id="randomvalP" style="display:none;">请输入奖励随机比例</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-4">
+							<label>恭喜文案:</label>
+							<textarea rows="3" id="congratulation" name="congratulation" style="margin: 0px; width: 510px; height: 80px;">@if(postReward==null){}else{@postReward.getCongratulation()}</textarea>
+							<p class="help-block" id="congratulationP" style="display:none;">请输入恭喜文案</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-4">
+							<label>说明文案:</label>
+							<textarea rows="3" id="remarktxt" name="remarktxt" style="margin: 0px; width: 510px; height: 80px;">@if(postReward==null){}else{@postReward.getRemarktxt()}</textarea>
+							<p class="help-block" id="remarktxtP" style="display:none;">请输入说明文案</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-4">
+							<label>规则文案:</label>
+							<textarea rows="3" id="ruletxt" name="ruletxt" style="margin: 0px; width: 510px; height: 80px;">@if(postReward==null){}else{@postReward.getRuletxt()}</textarea>
+							<p class="help-block" id="ruletxtP" style="display:none;">请输入规则文案</p>
+	                    </div>
+                    </div>
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="savePostRewardBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+            </div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<script type="text/javascript">
+//保存商品详情
+//提交表单，保存商品信息
+$("#savePostRewardBtn").click(function(){
+	var flag = true;
+	var typ = $('input:radio[name="typ"]:checked').val();
+	var randomval = $('input[name="randomval"]').val();
+	var congratulation = $('[name="congratulation"]').val();
+	var remarktxt = $('[name="remarktxt"]').val();
+	var ruletxt = $('[name="ruletxt"]').val();
+	var commisiontyp = $('input:radio[name="commisiontyp"]:checked').val();
+	if(commisiontyp==""||typeof(commisiontyp) == "undefined"){
+		$("#commisiontypP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#commisiontypP").attr("style","display:none");
+	}
+	var commision = "";
+	if(commisiontyp==1){
+		commision = $('input[name="commisionJine"]').val();
+	}else{
+		commision = $('input[name="commisionBili"]').val();
+	}
+	if(commision==""){
+		$("#commisionP").attr("style","color:red");
+		flag = false;
+	}else{
+		$('input[name="commision"]').val(commision);
+		$("#commisionP").attr("style","display:none");
+	}
+	if(typ==""||typeof(typ) == "undefined"){
+		$("#typP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#typP").attr("style","display:none");
+	}
+	if(randomval==""){
+		$("#randomvalP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#randomvalP").attr("style","display:none");
+	}
+	if(congratulation==""){
+		$("#congratulationP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#congratulationP").attr("style","display:none");
+	}
+	if(remarktxt==""){
+		$("#remarktxtP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#remarktxtP").attr("style","display:none");
+	}
+	if(ruletxt==""){
+		$("#ruletxtP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#ruletxtP").attr("style","display:none");
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#postRewardForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+
+</script>
+}

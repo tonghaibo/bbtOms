@@ -1,0 +1,210 @@
+@(id:Int)(userAddress : models.user.UserAddress)(typs:Html)
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		地址信息<small>@if(id == 0){新建}@if(id > 0){修改}</small>
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="tab-content" style="height:800px;">
+			<form role="form" action="/post/saveUserAddress" method="post" id="userAddressForm" >
+              	 <input type="hidden" id="id" name="id" value="@id">
+                 <div class="box-body">
+                 	<div class="row">
+                  		<div class="col-xs-4">
+							<label>类型:</label>
+							<select id="typ" name="typ" class="form-control">
+								@typs
+							</select>
+							<p class="help-block" id="typP" style="display:none;">请选择用户类型</p>
+						</div>
+                   </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>姓名:</label>
+							<input type="text" class="form-control" id="username" name="username" value="@if(userAddress==null){}else{@userAddress.getUsername()}">
+							<p class="help-block" id="usernameP" style="display:none;">请输入姓名</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    	<div class="col-xs-4">
+							<label>手机号:</label>
+							<input type="text" class="form-control" id="phone" name="phone" value="@if(userAddress==null){}else{@userAddress.getPhone()}" maxlength="11" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+							<p class="help-block" id="phoneP" style="display:none;">请输入手机号</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                    <div class="col-xs-4">
+						<label>地址:</label>
+							@if(id==0){
+								<div id="city_4">
+				                    <select class="prov" name="prov"></select> 
+				                    <select class="city" name="city" disabled="disabled"></select>
+				                    <select class="dist" name="dist" disabled="disabled"></select>
+				                </div>
+							    <input id="province" name="province" placeholder="请输入省市区" type="hidden" class="form-control" value=""/>
+			                }
+						    <input id="address" name="address" placeholder="请输入地址" type="text" class="form-control" value="@userAddress.getAddress()" onblur="showMap()"/>
+							<p class="help-block" id="addressP" style="display:none;">请输入详细地址</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>地址坐标:
+							（经度）<input type="text" class="form-control" id="longs" name="longs" value="@if(userAddress==null){}else{@userAddress.getLongs()}"><p class="help-block" id="longsP" style="display:none;">请输入经度</p></label>
+							<label>（纬度）<input type="text" class="form-control" id="lat" name="lat" value="@if(userAddress==null){}else{@userAddress.getLat()}"><p class="help-block" id="latP" style="display:none;">请输入纬度</p></label>
+	                    </div>
+                    </div>
+                    
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="saveUserAddressBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+               <div id="allmap" style="width: 600px;height: 600px;"></div>
+            </div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+<style type="text/css">
+   body, html,#allmap {width: 100%;height: 100%;overflow: hidden;margin:0;font-family:"微软雅黑";}
+</style>
+<script type="text/javascript" src="http://api.map.baidu.com/api?v=2.0&ak=5LVr5CieSP2a11pR4sHAtWGU"></script>
+<script type="text/javascript" src="/public/javascripts/jquery.cityselect.js"></script>
+<script type="text/javascript">
+var id = $("#id").val();
+if(id>0){
+	showMap();
+}
+$("#city_4").citySelect({
+	prov:"北京", 
+	city:"朝阳区", 
+	dist:"",
+    nodata: "none"
+}); 
+function showMap(){
+	// 百度地图API功能
+	var map = new BMap.Map("allmap");
+	var point = new BMap.Point(116.331398,39.897445);
+	map.centerAndZoom(point,12);
+	// 创建地址解析器实例
+	var myGeo = new BMap.Geocoder();
+	// 将地址解析结果显示在地图上,并调整地图视野
+	var prov="北京";	
+	var addressStr = $("#address").val();
+	if(id==0){
+		var prov = $(".prov").val();
+		var city = $(".city").val();
+		var dist = $(".dist").val();
+		var str = prov+city+addressStr;
+		if(dist!=null){
+			str = prov+city+dist+addressStr;
+		}
+	}else{
+		str = addressStr;
+	}
+	console.log(str);
+	myGeo.getPoint(str, function(point){
+		if (point) {
+			map.centerAndZoom(point, 16);
+			map.addOverlay(new BMap.Marker(point));
+			$("#longs").val(point.lng);
+			$("#lat").val(point.lat);
+		}else{
+			alertify.error("您选择地址没有解析到结果!");
+		}
+	}, prov);
+	function showInfo(e){
+		map.clearOverlays();  
+		console.log(e.point.lng + ", " + e.point.lat);
+		$("#longs").val(e.point.lng);
+		$("#lat").val(e.point.lat);
+		var point = new BMap.Point(e.point.lng, e.point.lat);
+		var marker = new BMap.Marker(point);  // 创建标注
+		map.addOverlay(marker);               // 将标注添加到地图中
+		marker.setAnimation(BMAP_ANIMATION_BOUNCE); //跳动的动画
+	}
+	map.addEventListener("click", showInfo);
+}
+
+//保存地址详情
+//提交表单，保存商品信息
+$("#saveUserAddressBtn").click(function(){
+	var flag = true;
+	var typ = $('[name="typ"] option:selected').val();
+	var username = $('[name="username"]').val();
+	var phone = $('[name="phone"]').val();
+	var address = $('[name="address"]').val();
+	var longs = $.trim($('[name="longs"]').val());
+	var lat = $.trim($('[name="lat"]').val());
+	if(id==0){
+		var prov = $(".prov").val();
+		var city = $(".city").val();
+		var dist = $(".dist").val();
+		var provinceStr = prov+city;
+		if(dist!=null){
+			provinceStr += dist;
+		}
+		$("#province").val(provinceStr);
+	}
+	if(typ==""||typeof(typ)=='undefined'||typ==-1){
+		$("#typP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#typP").attr("style","display:none");
+	}
+	if(username==""||username=="-1"){
+		$("#usernameP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#usernameP").attr("style","display:none");
+	}
+	if(phone==""){
+		$("#phoneP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#phoneP").attr("style","display:none");
+	}
+	if(address==""){
+		$("#addressP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#addressP").attr("style","display:none");
+	}
+	if(longs==""){
+		$("#longsP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#longsP").attr("style","display:none");
+	}
+	if(lat==""){
+		$("#latP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#latP").attr("style","display:none");
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#userAddressForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+</script>
+}

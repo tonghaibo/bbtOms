@@ -1,0 +1,10 @@
+#act
+GET    /reply                controllers.wx.WxTokenController.reply()
+POST   /reply                controllers.wx.WxTokenController.doWithWx()
+
+#menu
+GET    /createMenu           controllers.wx.WxMenuController.createMenu()
+GET    /deleteMenu           controllers.wx.WxMenuController.deleteMenu()
+#test
+GET		/pos					@controllers.wx.TestController.pos()
+GET		/getwxpos				@controllers.wx.TestController.getpos()

@@ -1,0 +1,5 @@
+#处理app升级
+GET    /appVersionManage           					controllers.app.AppVersionController.appVersionManage()
+GET    /newOrUpdateAppVersion           			controllers.app.AppVersionController.newOrUpdateAppVersion()
+POST   /saveAppVersion           					controllers.app.AppVersionController.saveAppVersion()
+GET    /changeAppVersionSta           				controllers.app.AppVersionController.changeAppVersionSta()

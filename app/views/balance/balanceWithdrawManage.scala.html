@@ -1,0 +1,407 @@
+@(totals: Integer)(currpage: Integer)(totalPage: Integer)(balanceWithdrawVoList: java.util.List[vo.BalanceWithdrawVo])(balanceWithdrawStas:Html)(formPage : form.BalanceWithdrawForm)
+@import utils.Dates
+@import play.Configuration
+@import utils.Constants.BalanceWithdrawSta
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		提现管理
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchbalanceWithdrawForm" name="searchbalanceWithdrawForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3">
+                  <label>状态</label>
+                  <select id="sta" name="sta" class="form-control">
+                  	@balanceWithdrawStas
+                  </select>
+                </div>
+                <div class="col-xs-3" >
+                  <label>申请时间</label>
+                  <input id="between" name="between" type="text" class="form-control" placeholder="请选择申请时间" readonly value='@formPage.between'/>
+                </div>
+                <div class="col-xs-3" >
+                  <label>关键字</label>
+                  <input id="keyword" name="keyword" type="text" class="form-control" placeholder="姓名/手机号/支付宝账号" value="@request().getQueryString("keyword")"/>
+                </div>
+              </div>
+              <br/> 
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="button" onclick="exportBalanceWithdrawFunction();">导出Excel</button>
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="balanceWithdrawTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>选择</th>
+                        <th>ID</th>
+                        <th>快递员姓名</th>
+                        <th>手机号</th>
+                        <th>支付宝账号</th>
+                        <th>提现金额（元）</th>
+                        <th>申请时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                  @if(balanceWithdrawVoList!=null  && balanceWithdrawVoList.size() > 0){
+	                @for(balanceWithdraw <- balanceWithdrawVoList){
+                          <tr class="h6" data-uid="@balanceWithdraw.balanceWithdrawId">
+                              <td><input type="checkbox" value="@balanceWithdraw.balanceWithdrawId" name="bwdid" ></td>
+                              <td>@balanceWithdraw.balanceWithdrawId</td>
+                              <td><a href="javascript:void(0);" data-toggle="modal" data-target="#myModal@balanceWithdraw.balanceWithdrawId">@balanceWithdraw.nickname</a></td>
+                              <td>@balanceWithdraw.phone</td>
+                              <td>@balanceWithdraw.alipayAccount</td>
+                              <td>@balanceWithdraw.amount</td>
+                              <td>@balanceWithdraw.dateNew</td>
+                              <td>@BalanceWithdrawSta.stas2Message(balanceWithdraw.sta.toInt)</td>
+                              <td>
+                                @if(balanceWithdraw.sta!=null&&balanceWithdraw.sta=="1"){
+	                            	<a class="btn btn-success btn-sm" href="javascript:void(0);" onclick="changeBalanceWithdrawSta(@balanceWithdraw.balanceWithdrawId,2)">付款</a> 
+                                }
+                                @if(balanceWithdraw.sta!=null&&balanceWithdraw.sta=="1"){
+                            	<!-- Button trigger modal -->
+								<button type="button" class="btn btn-warning btn-sm" data-toggle="modal" data-target="#myBackModal@balanceWithdraw.balanceWithdrawId">
+								  驳回
+								</button>
+                            	 <div class="modal fade" id="myBackModal@balanceWithdraw.balanceWithdrawId" tabindex="-1" role="dialog" aria-labelledby="myBackModalLabel@balanceWithdraw.balanceWithdrawId">
+								  <div class="modal-dialog" role="document">
+								    <div class="modal-content">
+								      <div class="modal-header">
+								        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								        <h4 class="modal-title" id="myBackModalLabel@balanceWithdraw.balanceWithdrawId">驳回</h4>
+								      </div>
+								      <div class="modal-body">
+               							<form method="get" id="backBalanceWithdrawForm" name="backBalanceWithdrawForm" action="/balance/backBalanceWithdraw">
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            	<label for="recipient-name" class="control-label" style="float: right;">驳回理由:</label>
+								            </div>
+                  							<div class="col-xs-9">
+								            	<select id="reason" name="reason"  style="margin: 0px; width: 300px; ">
+								            		<option value="账号错误，打款失败">账号错误，打款失败</option>
+								            		<option value="账号与姓名不匹配">账号与姓名不匹配</option>
+								            		<option value="其他">其他</option>
+								            	</select>
+								            	<input type="hidden" id="backId" name="backId" value="@balanceWithdraw.balanceWithdrawId">
+								            	<br/>
+								            </div>
+								          </div>
+								           <div class="row">
+                  							<div class="col-xs-3">
+                  							</div>
+                  							<div class="col-xs-9">
+								            	<textarea style="display:none;" rows="3" cols="55" id="reasoncontent" name="reasoncontent" style="width: 300px; height: 80px;"></textarea>
+								            </div>
+								           </div>
+ 							            </form>
+								      </div>
+								      <div class="modal-footer">
+								        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								        <button type="button" class="btn btn-primary" name="backBalanceWithdrawBtn" id="backBalanceWithdrawBtn">提交</button>
+								      </div>
+								    </div>
+								  </div>
+								</div>
+                                }
+                                @if(balanceWithdraw.sta!=null&&balanceWithdraw.sta=="3"){
+	                            <a href="javascript:void(0);" data-toggle="modal" data-target="#myBackReasonModal@balanceWithdraw.balanceWithdrawId">查看驳回理由</a>
+                            	 <div class="modal fade" id="myBackReasonModal@balanceWithdraw.balanceWithdrawId" tabindex="-1" role="dialog" aria-labelledby="myBackReasonModalLabel@balanceWithdraw.balanceWithdrawId">
+								  <div class="modal-dialog" role="document">
+								    <div class="modal-content">
+								      <div class="modal-header">
+								        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								        <h4 class="modal-title" id="myBackReasonModalLabel@balanceWithdraw.balanceWithdrawId">驳回理由</h4>
+								      </div>
+								      <div class="modal-body">
+								      	@balanceWithdraw.operRemark
+								      </div>
+								      <div class="modal-footer">
+								        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								      </div>
+								    </div>
+								  </div>
+								</div>
+                                }
+                                <div class="modal fade" id="myModal@balanceWithdraw.balanceWithdrawId" tabindex="-1" role="dialog" aria-labelledby="myModalLabel@balanceWithdraw.balanceWithdrawId">
+								  <div class="modal-dialog" role="document">
+								    <div class="modal-content">
+								      <div class="modal-header">
+								        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+								        <h4 class="modal-title" id="myModalLabel@balanceWithdraw.balanceWithdrawId">快递员信息</h4>
+								      </div>
+								      <div class="modal-body">
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            	<label for="recipient-name" class="control-label" style="float: right;">快递员ID:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            	<label id="puId">@balanceWithdraw.postmanuserId</label>
+								            </div>
+								          </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            	<label for="message-text" class="control-label" style="float: right;">快递员姓名:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            	<label id="puNickname">@balanceWithdraw.nickname</label>
+								            </div>
+								          </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            <label for="message-text" class="control-label" style="float: right;">手机号:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            <label id="puPhone">@balanceWithdraw.phone</label>
+								          	</div>
+								          </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            <label for="message-text" class="control-label" style="float: right;">身份证号:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            <label id="puCardidno">@balanceWithdraw.cardidno</label>
+								          </div>
+								          </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            <label for="message-text" class="control-label" style="float: right;">快递公司:</label>
+								             </div>
+                  							<div class="col-xs-3">
+								            <label id="puCompanyname">@balanceWithdraw.companyname</label>
+								          </div>
+								           </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            <label for="message-text" class="control-label" style="float: right;">分站名称:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            <label id="puSubstation">@balanceWithdraw.substation</label>
+								          </div>
+								          </div>
+								          <div class="row">
+                  							<div class="col-xs-3">
+								            <label for="message-text" class="control-label" style="float: right;">工号:</label>
+								            </div>
+                  							<div class="col-xs-3">
+								            <label id="puStaffid">@balanceWithdraw.staffid</label>
+								          </div>
+								          </div>
+								      </div>
+								      <div class="modal-footer">
+								        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+								      </div>
+								    </div>
+								  </div>
+								</div>
+                              </td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="10">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                	<tr id="operTr">
+	                    <th colspan="10" id="selectAllTh">
+	                        <input id="selectAll" name="selectAll" type="checkbox"> <label id="selectAllLabel">全选</label> &nbsp;
+	                        <a class="btn btn-success btn-sm" href="#" title="批量确认付款" id="piliangOkDeal"><i class="fa fa-bolt"></i> 批量确认付款</a>
+	                    </th>
+	                </tr>
+                </tfoot>
+           		</table>
+           		<div>
+	            <div class="col-xs-6">
+	                <div class="dataTables_info" id="userTable_info">页码：@{
+	                   currpage + 1
+	                }/@totalPage  共计 @totals 条记录
+	                </div> 
+			   </div>
+			   <div class="col-xs-6">
+	                <div class="dataTables_paginate paging_bootstrap">
+	                    <ul class="pagination">
+	                    
+	                    @if(currpage < 1){
+	                 		<li class="prev disabled"><a href="javascript:">首页</a></li>
+		               	}else{
+		               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+		               	}
+		               	@for(index <- 0 to (totalPage-1)){
+	                	@if(totalPage< 8){
+	                		<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+	                  	}else{
+	                       	@if(currpage<7) {
+								@if(index < 8){
+									<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == totalPage-1){
+										<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == totalPage-1){
+				               			<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{	
+								@if(currpage < totalPage-4){
+								 	@if(index==0 || index > currpage-4 &&  index < currpage +5){
+								 		<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+									}else{
+										@if(index == 2){
+								 			<li class=""><a href="javascript:">...</a></li>
+										}
+										@if(index == totalPage-1){
+					                		<li class=""><a href="javascript:">...</a></li>
+				                		}
+					               		@if(index == totalPage){
+					                		<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+				                		}
+									}
+								}else{
+									@if(index==0 || index > totalPage-8){
+										<li class="@if(index == currpage){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								   		}else{
+								   			@if(index==2){
+								   				<li class=""><a href="javascript:">...</a></li>
+								   			}
+								   		}
+								   	}
+				  				 }
+							}  
+	                      }
+	                    @if(currpage==totalPage){
+	                    	<li class="next disabled"><a href="javascript:">尾页</a></li>
+	                    }else{
+	                      	<li class="next"><a href="@searchParam()page=@{totalPage-1}">尾页</a></li>
+	                    }
+                    </ul>
+                </div>
+			   </div>
+			 </div>
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+$("input[type='checkbox']").iCheck({
+	checkboxClass : 'icheckbox_square-blue'
+});
+$("#between").daterangepicker({
+    locale: {
+        applyLabel: '确定',
+        cancelLabel: '取消',
+        fromLabel: '开始',
+        toLabel: '结束',
+        weekLabel: 'W',
+        customRangeLabel: 'Custom Range',
+        showDropdowns: true
+    },
+    format: 'YYYY/MM/DD'
+});
+
+//全选
+$("#selectAll").on('ifUnchecked', function() {
+	$("input[type='checkbox']", "#balanceWithdrawTable").iCheck("uncheck");
+}).on('ifChecked', function() {
+	$("input[type='checkbox']", "#balanceWithdrawTable").iCheck("check");
+});
+
+
+function changeBalanceWithdrawSta(id, sta){
+	if(sta==2){
+		var flagStr = confirm("请再次确认付款通过！");
+		if(flagStr == true){
+			console.log("succeful , change sta 2");
+			window.location.href="/balance/changeBalanceWithdrawSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消提现付款操作");
+			return false;
+		}	
+	}
+}
+//批量通过
+$("#piliangOkDeal").click(function(){
+	//获取所有被选中的select
+	var bwdids = getCheckedBalanceWithdrawId();
+	console.log("bwdids:"+bwdids);
+	if(bwdids==""){
+		alert("请选择相应的提现信息！");
+		return false;
+	}
+	var flag = confirm("请再次确认批量提现付款操作通过！");
+	if(flag == true){
+		window.location.href="/balance/piliangChangeBalanceWithdrawSta?bwdids="+bwdids+"&sta="+2;
+	}else{
+		return false;
+	}
+})
+//获取选中的id 集合
+function getCheckedBalanceWithdrawId(){
+	var array = new Array();
+	$("input[name = 'bwdid']:checkbox").each(function () {
+		if(true==$(this).prop("checked")||"checked"==$(this).prop("checked")){
+			array.push($(this).val());
+		}
+	});
+	return array.join(",");
+} 
+//展示快递员详细信息
+function showPostmanUserInfo(postmanUser){
+	$('#myModal').modal(options);
+}
+//驳回理由变更
+$("[name='reason']").change(function(){
+	var reason = $(this).children('option:selected').val();
+	var currentDiv=$(this).parent().parent().parent();
+	if(reason=="其他"){
+		currentDiv.find("[name='reasoncontent']").css("display","block");
+	}else{
+		currentDiv.find("[name='reasoncontent']").css("display","none");
+	}
+})
+
+//提交驳回
+$("[name='backBalanceWithdrawBtn']").click(function(){
+	console.log("提交驳回");
+	console.log($(this));
+	$(this).parent().parent().find("[name='backBalanceWithdrawForm']").submit();
+})
+
+//导出提现管理信息
+function exportBalanceWithdrawFunction(){
+	var sta=$("#sta").val();
+	var between=$("#between").val();
+	var keyword=$("#keyword").val();
+	console.log(sta+"-"+between+"-"+keyword)
+	window.location.href='/balance/exportBalanceWithdraw?sta='+sta+'&between='+between+'&keyword='+keyword;
+}
+
+</script>
+}

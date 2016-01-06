@@ -1,0 +1,172 @@
+@(statsDailyDeliveryOrderPage : com.avaje.ebean.PagedList[models.statistics.StatDailyDeliveryOrder])(formPage : form.StatsDailyForm)
+@import views.html.statistics.searchParam
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		配送订单数据
+	</h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchForm" name="searchForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3" >
+                  <label>统计日期</label>
+					<input id="between" name="between" type="text" class="form-control" placeholder="请选择统计时间" readonly value='@formPage.between'/>
+                </div>
+                <div class="col-xs-3" >
+                    <label>订单来源</label>
+                    <input id="keyword" name="keyword" type="text" class="form-control" placeholder="订单来源" value="@request().getQueryString("keyword")"/>
+                </div>
+              </div>
+              <br/>
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="statsDailyDeliveryRouteManage" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>统计日期</th>
+                        <th>订单来源</th>
+                        <th>新增订单数</th>
+                        <th>新增完成数</th>
+                        <th>新增滞留数</th>
+                        <th>新增拒收数</th>
+                        <th>完成人数</th>
+                        <th>滞留人数</th>
+                        <th>拒收人数</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   @if(statsDailyDeliveryOrderPage!=null && statsDailyDeliveryOrderPage.getList() != null && statsDailyDeliveryOrderPage.getList().size() > 0){
+                      @for(statsDailyDeliveryRoute <- statsDailyDeliveryOrderPage.getList()){
+                          <tr class="h6" data-uid="@statsDailyDeliveryRoute.getId()">
+                              <td>@statsDailyDeliveryRoute.getStatDate()</td>
+                              <td>@statsDailyDeliveryRoute.getSource()</td>
+                              <td>@statsDailyDeliveryRoute.getNewOrderCnt</td>
+                              <td>@statsDailyDeliveryRoute.getNewCompleteCnt</td>
+                              <td>@statsDailyDeliveryRoute.getNewSuspendCnt</td>
+                              <td>@statsDailyDeliveryRoute.getNewRejectCnt</td>
+                              <td>@statsDailyDeliveryRoute.getCompleteCnt</td>
+                              <td>@statsDailyDeliveryRoute.getSuspendCnt</td>
+                              <td>@statsDailyDeliveryRoute.getRejectCnt</td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="10">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(statsDailyDeliveryOrderPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    statsDailyDeliveryOrderPage.getPageIndex() + 1
+		                }/@statsDailyDeliveryOrderPage.getTotalPageCount() 共计@statsDailyDeliveryOrderPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+
+		                     @if(statsDailyDeliveryOrderPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+
+                @for(index<- 0 to (statsDailyDeliveryOrderPage.getTotalPageCount()-1)){
+                	@if(statsDailyDeliveryOrderPage.getTotalPageCount()< 8){
+                		<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(statsDailyDeliveryOrderPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == statsDailyDeliveryOrderPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == statsDailyDeliveryOrderPage.getTotalPageCount()-1){
+			               			<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{
+							@if(statsDailyDeliveryOrderPage.getPageIndex() < statsDailyDeliveryOrderPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > statsDailyDeliveryOrderPage.getPageIndex()-4 &&  index < statsDailyDeliveryOrderPage.getPageIndex() +5){
+							 		<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == statsDailyDeliveryOrderPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == statsDailyDeliveryOrderPage.getTotalPageCount()){
+				                		<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > statsDailyDeliveryOrderPage.getTotalPageCount()-8){
+									<li class="@if(index == statsDailyDeliveryOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}
+                      }
+                      @if(statsDailyDeliveryOrderPage.getPageIndex()==statsDailyDeliveryOrderPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{statsDailyDeliveryOrderPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+    <script type="text/javascript">
+    $("#between").daterangepicker({
+    locale: {
+    applyLabel: '确定',
+    cancelLabel: '取消',
+    fromLabel: '开始',
+    toLabel: '结束',
+    weekLabel: 'W',
+    customRangeLabel: 'Custom Range',
+    },
+    format: 'YYYY/MM/DD'
+    });
+    </script>
+}

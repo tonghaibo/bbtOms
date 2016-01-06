@@ -1,0 +1,29 @@
+@()@searchParam() = @{
+    var href = "?"
+    var typ = request().getQueryString("typ")
+    var sta = request().getQueryString("sta")
+    var title = request().getQueryString("title")
+    
+    if(typ != "" && typ != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "typ=" + typ
+    }
+    if(sta != "" && sta != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "sta=" + sta
+    }
+    if(title != "" && title != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "title=" + title
+    }
+    if(href != "?"){
+        href += "&"
+    }
+    href
+}@searchParam()

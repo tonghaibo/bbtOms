@@ -1,0 +1,168 @@
+@(statsDailyPostmanTaskPage : com.avaje.ebean.PagedList[models.statistics.StatDailyPostmanTask])(formPage : form.StatsDailyForm)
+@import views.html.statistics.searchParam
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		快递员任务数据
+	</h1>
+
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchForm" name="searchForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3" >
+                  <label>统计日期</label>
+					<input id="between" name="between" type="text" class="form-control" placeholder="请选择统计时间" readonly value='@formPage.between'/>
+                </div>
+              </div>
+              <br/>
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="StatsDailyPostmanTaskManage" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>统计日期</th>
+                        <th>App任务列表PV</th>
+                        <th>App任务列表UV</th>
+                        <th>App任务详情PV</th>
+                        <th>App任务详情UV</th>
+                        <th>Widget任务列表PV</th>
+                        <th>Widget任务列表UV</th>
+                        <th>Widget任务详情PV</th>
+                        <th>Widget任务详情UV</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   @if(statsDailyPostmanTaskPage!=null && statsDailyPostmanTaskPage.getList() != null && statsDailyPostmanTaskPage.getList().size() > 0){
+                      @for(statsDailyPostmanTask <- statsDailyPostmanTaskPage.getList()){
+                          <tr class="h6" data-uid="@statsDailyPostmanTask.getId()">
+                              <td>@statsDailyPostmanTask.getStatDate()</td>
+                              <td>@statsDailyPostmanTask.getAppTaskListPv()</td>
+                              <td>@statsDailyPostmanTask.getAppTaskListUv()</td>
+                              <td>@statsDailyPostmanTask.getAppTaskDetailPv()</td>
+                              <td>@statsDailyPostmanTask.getAppTaskDetailUv()</td>
+                              <td>@statsDailyPostmanTask.getWidgetTaskListPv()</td>
+                              <td>@statsDailyPostmanTask.getWidgetTaskListUv()</td>
+                              <td>@statsDailyPostmanTask.getWidgetTaskDetailPv()</td>
+                              <td>@statsDailyPostmanTask.getWidgetTaskDetailUv()</td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="10">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(statsDailyPostmanTaskPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    statsDailyPostmanTaskPage.getPageIndex() + 1
+		                }/@statsDailyPostmanTaskPage.getTotalPageCount() 共计@statsDailyPostmanTaskPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+
+		                     @if(statsDailyPostmanTaskPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+
+                @for(index<- 0 to (statsDailyPostmanTaskPage.getTotalPageCount()-1)){
+                	@if(statsDailyPostmanTaskPage.getTotalPageCount()< 8){
+                		<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(statsDailyPostmanTaskPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == statsDailyPostmanTaskPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == statsDailyPostmanTaskPage.getTotalPageCount()-1){
+			               			<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{
+							@if(statsDailyPostmanTaskPage.getPageIndex() < statsDailyPostmanTaskPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > statsDailyPostmanTaskPage.getPageIndex()-4 &&  index < statsDailyPostmanTaskPage.getPageIndex() +5){
+							 		<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == statsDailyPostmanTaskPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == statsDailyPostmanTaskPage.getTotalPageCount()){
+				                		<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > statsDailyPostmanTaskPage.getTotalPageCount()-8){
+									<li class="@if(index == statsDailyPostmanTaskPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}
+                      }
+                      @if(statsDailyPostmanTaskPage.getPageIndex()==statsDailyPostmanTaskPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{statsDailyPostmanTaskPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+    <script type="text/javascript">
+    $("#between").daterangepicker({
+    locale: {
+    applyLabel: '确定',
+    cancelLabel: '取消',
+    fromLabel: '开始',
+    toLabel: '结束',
+    weekLabel: 'W',
+    customRangeLabel: 'Custom Range',
+    },
+    format: 'YYYY/MM/DD'
+    });
+    </script>
+}

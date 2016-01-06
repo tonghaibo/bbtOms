@@ -1,0 +1,22 @@
+
+GET        /firstOrder                     controllers.h5.TaskController.firstOrder()
+GET        /sale                           controllers.h5.TaskController.sale()
+GET        /weixin                         controllers.h5.TaskController.weixin()
+GET        /expressMall                    controllers.h5.TaskController.expressMall()
+GET        /fanpai                         controllers.h5.TaskController.fanpai()
+GET        /fanpaiStore                    controllers.h5.TaskController.fanpaiStore()
+GET        /receiveStore                   controllers.h5.TaskController.receiveStore()
+GET        /news                           controllers.h5.TaskController.news()
+GET        /newsList                       controllers.h5.TaskController.newsList()
+GET        /newsListForJson                controllers.h5.TaskController.newsListForJson()
+GET        /getMagaIdOld                   controllers.h5.TaskController.getMagaIdOld()
+
+GET        /balanceList                    controllers.h5.BalanceController.balanceList()
+GET        /balanceWithdrawListJson        controllers.h5.BalanceController.balanceWithdrawListJson()
+GET        /balanceIncomeListJson          controllers.h5.BalanceController.balanceIncomeListJson()
+GET        /scheduleInfo/:id               controllers.h5.BalanceController.scheduleInfo(id:Int)
+#####1.1推广商品任务
+GET        /pre                            controllers.h5.TaskController.pre
+GET        /showcode/:postmanid            controllers.h5.TaskController.showcode(postmanid:Int)
+GET        /timeDelay/:wait                controllers.h5.TaskController.timeDelay(wait:Int)
+

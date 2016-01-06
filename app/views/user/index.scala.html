@@ -1,0 +1,143 @@
+@(sign:models.wx.WxSign)(openid:String)
+@views.html.usermain {  
+<title>棒棒糖生活</title>
+}{
+<div class="container">                    
+
+           <div class="banner">
+
+               <img src="@assets.CdnAssets.urlForAPIPublic("images/h5/user/index.png")"/>
+
+               <h2>附近有超过<b><span id="mancount">17</span></b>位配送员<br>能够为您服务</h2>
+
+           </div>
+
+           <div class="btn-wrap fixed">
+
+               <a href="/user/preorder" class="btn">想发点我</a>
+
+           </div>
+
+        </div>
+}{  
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/count.js")"></script>
+ <script>
+ var counturl = location.href.split('#')[0];
+
+ 	jQuery(function($){
+ 		var url = 'http://chaxun.1616.net/s.php?type=ip&output=json&callback=?&_='+Math.random(); 
+ 		$.getJSON(url, function(data){	
+ 			//添加统计
+ 			addcountwx(data.Ip,counturl,'bbt_samecity','@openid');
+ 		});
+ 	});
+ </script>
+ <script>    
+        var postmancount=0;
+        wx.config({
+            debug: false,
+            appId: '@sign.getAppId()',
+            timestamp: '@sign.getTimstr()',
+            nonceStr: '@sign.getNostr()',
+            signature: '@sign.getSign()',
+            jsApiList: ['checkJsApi',
+                        'onMenuShareTimeline',
+                        'onMenuShareAppMessage'
+            ]
+          });
+        	wx.ready(function () {
+            // 1 判断当前版本是否支持指定 JS 接口，支持批量判断
+        		wx.checkJsApi({
+        		  jsApiList: [
+        			'getNetworkType',
+        			'openLocation',
+        			'getLocation',
+        			'previewImage'
+        		  ],
+        		  success: function (res) {
+        			//alert(JSON.stringify(res));
+        		  }
+        		});
+        		wx.getLocation({
+        			  type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+        			    success: function (res) {
+        			        var latitude = res.latitude; // 纬度，浮点数，范围为90 ~ -90
+        			        var longitude = res.longitude; // 经度，浮点数，范围为180 ~ -180。
+        			        var speed = res.speed; // 速度，以米/每秒计
+        			        var accuracy = res.accuracy; // 位置精度
+        			       // alert(latitude);
+        			       // alert(longitude);
+        			        getpostcount(latitude,longitude);
+        			        setTimeout(function(){
+        			        	editlatlng(latitude,longitude);
+	        				},2000);
+        			    }
+        		});
+        		wx.onMenuShareTimeline({
+        			title: 'test',
+					  link: 'http://h5dev.higegou.com/user/index',
+					  imgUrl: '',
+				    success: function () { 
+				        // 用户确认分享后执行的回调函数
+				    },
+				    cancel: function () { 
+				        // 用户取消分享后执行的回调函数
+				    }
+				});
+
+				wx.onMenuShareAppMessage({
+					title: 'test',
+					  desc: 'test',
+					  link: 'http://h5dev.higegou.com/user/index',
+					  imgUrl: '',
+					  success: function (res) {
+						//alert('已分享');
+					  },
+					  cancel: function (res) {
+						//alert('已取消');
+					  }
+				  });		
+        		
+				  wx.error(function (res){
+						  alert(res.errMsg);
+				  });
+        	});
+        	//保存经纬度
+        	function editlatlng(lat,lng){
+        		 $.ajax({
+     	            type:"POST",
+     	            url:"/user/editlatlng",
+     	            data:{lat:lat,lng:lng},
+     	            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+     	            beforeSend:function(){},    
+     	            success:function(data){   
+     	            }   ,
+     	            complete: function(XMLHttpRequest, textStatus){
+     	            },
+     	            error: function(){
+     	                //_alert("发送失败!");
+     	            }
+     	         	});  
+        	}
+        	//获取3公里内快递员数量
+        	function getpostcount(lat,lng){
+        		$.ajax({
+     	            type:"POST",
+     	            url:"/user/getpostmancount",
+     	            data:{lat:lat,lng:lng},
+     	            datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+     	            beforeSend:function(){},  
+     	            success:function(data){                           
+     	            	postmancount=data.count;
+     	            	document.getElementById("mancount").innerHTML=postmancount;
+     	            	//alert(postmancount);
+     	            }   ,
+     	            complete: function(XMLHttpRequest, textStatus){
+     	            },
+     	            error: function(){
+     	                //_alert("发送失败!");
+     	            }        
+     	         	});  
+        	}
+        </script>  
+}

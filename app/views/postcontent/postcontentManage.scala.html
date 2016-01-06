@@ -1,0 +1,205 @@
+@(postcontentPage : com.avaje.ebean.PagedList[models.postcontent.Postcontent])(postcontentStas:Html)(postcontentTyps:Html)
+@import utils.Dates
+@import play.Configuration
+@import utils.Constants.PostcontentStas
+@import utils.Constants.PostcontentTyps
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		任务管理 
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchpostcontentForm" name="searchpostcontentForm">
+              <div class="row">
+              <!-- text input -->
+                <div class="col-xs-3">
+                  <label>任务类型</label>
+                  <select id="typ" name="typ" class="form-control">
+                  	@postcontentTyps
+                  </select>
+                </div>
+                <div class="col-xs-3">
+                  <label>任务状态</label>
+                  <select id="sta" name="sta" class="form-control">
+                  	@postcontentStas
+                  </select>
+                </div>
+                <div class="col-xs-3" >
+                  <label>关键字</label>
+                  <input id="title" name="title" type="text" class="form-control" placeholder="请输入任务标题" value="@request().getQueryString("title")"/>
+                </div>
+              </div>
+              <br/> 
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 15px;" type="submit">查询</button>
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 10px;" type="button" onclick="javascript:window.location.href='/postcontent/newOrUpdatePostcontent'">+ 新建</button>
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="postcontent" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                      <th>ID</th>
+                        <th>类型</th>
+                        <th>标题</th>
+                        <th>预计收益（分）</th>
+                        <th>创建时间</th>
+                        <th>开始时间</th>
+                        <th>结束时间</th>
+                        <th>排序值</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                   @if(postcontentPage!=null && postcontentPage.getList() != null && postcontentPage.getList().size() > 0){
+                      @for(postcontent <- postcontentPage.getList()){
+                          <tr class="h6" data-uid="@postcontent.getId()">
+                              <td>@postcontent.getId()</td>
+                              <td>@PostcontentTyps.typs2Message(postcontent.getTyp().toInt)</td>
+                              <td>@postcontent.getTitle()</td>
+                              <td>@postcontent.getExpectamount()</td>
+                              <td>@Dates.formatDateTime(postcontent.getDateNew())</td>
+                              <td>@postcontent.getStart_tim()</td>
+                              <td>@postcontent.getEnd_tim()</td>
+                              <td>@postcontent.getNsort()</td>
+                              <td>@PostcontentStas.stas2Message(postcontent.getSta().toInt)</td>
+                              <td>
+                              	<a class="btn btn-info" href="/postcontent/newOrUpdatePostcontent?id=@postcontent.getId()" >修改</a> 
+                                @if(postcontent.getSta()!=null&&postcontent.getSta()=="0"){
+	                            	<a class="btn btn-warning" href="javascript:void(0);" onclick="changePostcontentSta(@postcontent.getId(),1)">激活</a> 
+                                }
+                                @if(postcontent.getSta()!=null&&postcontent.getSta()=="1"){
+	                            	<a class="btn btn-warning" href="javascript:void(0);" onclick="changePostcontentSta(@postcontent.getId(),0)">失效</a> 
+                                }
+                              </td>
+                          </tr>
+                        }
+                    }else{
+                        <tr><td class="text-center" colspan="10">没有可用数据</td></tr>
+                    }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(postcontentPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    postcontentPage.getPageIndex() + 1
+		                }/@postcontentPage.getTotalPageCount() 共计@postcontentPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(postcontentPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (postcontentPage.getTotalPageCount()-1)){
+                	@if(postcontentPage.getTotalPageCount()< 8){
+                		<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(postcontentPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == postcontentPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == postcontentPage.getTotalPageCount()-1){
+			               			<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(postcontentPage.getPageIndex() < postcontentPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > postcontentPage.getPageIndex()-4 &&  index < postcontentPage.getPageIndex() +5){
+							 		<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == postcontentPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == postcontentPage.getTotalPageCount()){
+				                		<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > postcontentPage.getTotalPageCount()-8){
+									<li class="@if(index == postcontentPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(postcontentPage.getPageIndex()==postcontentPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{postcontentPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+function changePostcontentSta(id, sta){
+	if(sta==0){
+		var flagStr = confirm("请再次确认对此任务进行失效处理！");
+		if(flagStr == true){
+			console.log("succeful , change sta 0");
+			window.location.href="/postcontent/changePostcontentSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消失效任务操作");
+			return false;
+		}	
+	}else{
+		var flagStr = confirm("请再次确认对此任务进行激活处理！");
+		if(flagStr == true){
+			console.log("succeful , change sta 1");
+			window.location.href="/postcontent/changePostcontentSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消失效任务操作");
+			return false;
+		}	
+	}
+}
+</script>
+}

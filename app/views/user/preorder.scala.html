@@ -1,0 +1,193 @@
+@(sender:models.user.UserAddress)(receiver:models.user.UserAddress)(sign:models.wx.WxSign)(openid:String)
+@views.html.usermain {
+<!-- css -->
+<title>棒棒糖生活</title>
+}{
+<!-- content -->
+<div class="container">
+
+            <form role="form" method="get" action="/user/nextorder">
+            <input type="hidden" id="sid" name="sid" value="@if(sender!=null){@sender.getId()}" />
+            <input type="hidden" id="rid" name="rid" value="@if(receiver!=null){@receiver.getId()}" />				
+                <div class="content content-m-t">
+
+                    <div class="order-address">
+
+                        <ul class="order-address-info">
+
+                           <li onClick="window.location.href='/user/address?flag=1@if(sender!=null){&sid=@sender.getId()}@if(receiver!=null){&rid=@receiver.getId()}'">
+
+                              <p>@if(sender!=null){@sender.getAddress()}else{<font class="fontcolor">输入寄件人地址</font>}</p>
+
+                              <i class="ico-next"></i>
+
+                           </li>   
+
+                           <li onClick="window.location.href='/user/address?flag=2@if(sender!=null){&sid=@sender.getId()}@if(receiver!=null){&rid=@receiver.getId()}'">
+
+                              <p>@if(receiver!=null){@receiver.getAddress()}else{<font class="fontcolor">输入收件人地址</font>}</p>
+
+                              <i class="ico-next"></i>
+
+                           </li>             
+
+                        </ul>
+
+                        <div class="order-address-ico">
+
+                           <i class="ico-send"></i>
+
+                           <em></em>
+
+                           <i class="ico-income"></i>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="content content-m-t10">
+
+                   <div class="weight">
+
+                     <i id="parseclass" class="ico-cut" onclick="parsle()"></i>
+						<input type="hidden" id="count" value="5" />
+                     <p><input class="input" id="counttext" type="text" value="5公斤及以下" readonly/></p>
+
+                     <i id="addclass" class="ico-add ico-add-h" onclick="add()"></i>
+
+                   </div>
+
+                </div>
+
+                <div class="content content-m-t10">
+
+                   <div class="row row-p">
+
+                      <div class="fl fontcolor">
+
+                         取件时间
+
+                      </div>
+
+                      <div class="fr pickup-value">
+
+                         <select class="select" id="taketim" name="taketim">
+
+                            <option>立即取件</option>
+
+                            <option>啥时候取件呢</option>
+
+                         </select>
+
+                       </div>
+
+                       <i class="ico-next"></i>
+
+                   </div>
+
+                </div>
+
+                <div class="btn-wrap fixed">
+
+                   <div class="freight">
+
+                      <span>总价：<b>0</b><em>元</em></span>
+
+                      <button class="btn"@if(sender==null || receiver==null){ disabled} onclick="savecache()">下一步</button>
+
+                   </div>
+
+                </div>
+
+            </form>
+
+        </div>
+}{
+<!-- javascript -->
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/count.js")"></script>
+ <script>
+ var counturl = location.href.split('#')[0];
+
+ 	jQuery(function($){
+ 		var url = 'http://chaxun.1616.net/s.php?type=ip&output=json&callback=?&_='+Math.random(); 
+ 		$.getJSON(url, function(data){	
+ 			//添加统计
+ 			addcountwx(data.Ip,counturl,'bbt_samecity','@openid');
+ 		});
+ 	});
+ </script>
+ <script src="@assets.CdnAssets.urlForAPIPublic("javascripts/address.js")"></script>
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/checkform.js")"></script>
+<script>
+window.localStorage.setItem('counttext',"5公斤及以下");
+window.localStorage.setItem('count',"5");
+window.localStorage.setItem('taketim','0');
+		   var d = new Date();
+		   var Hours = d.getHours() + 1;
+		   var html = '';
+		   for (var i = Hours; i <= 21; i++){
+			   if(i == Hours){
+				 html += '<option>立即取件</option>'; 
+			   } else {
+				 html += '<option value='+i+'>'+ i  +'时</option>';  
+			   }
+		   }
+
+		   for (var i = 6; i < 22; i++){
+			   html += '<option value=t'+i+'>明天'+ i  +'时</option>';  
+		   }
+
+           $('.select').html(html);
+           
+           var limitcount=20;
+           function add(){
+        	  	var nums=document.getElementById("count").value;
+        	 	
+        	 	var endnum=(nums-1)+3-1;
+        	 	if(endnum>=limitcount){
+        	 		endnum=limitcount;        	 		
+        	 	}
+        	 	document.getElementById("counttext").value=endnum+"公斤及以下";
+        	 	$("#addclass").attr("class","ico-add ico-add-h");
+        	 	$("#parseclass").attr("class","ico-cut ico-cut-h");
+        	 	if(endnum>=20){
+        	 		$("#addclass").attr("class","ico-add");
+        	 		endnum=20;	
+        	 	}
+        	 	document.getElementById("count").value=endnum;
+        	 	window.localStorage.setItem('counttext',endnum+"公斤及以下");
+        	 	window.localStorage.setItem('count',endnum);
+         	 }
+        	 function parsle(){
+        	 	var nums=document.getElementById("count").value;
+        	 	$("#parseclass").attr("class","ico-cut ico-cut-h");
+        	 	$("#addclass").attr("class","ico-add ico-add-h");
+        	 	var endnum=nums-1;
+        	 	if(endnum<=5){
+        	 		endnum=5;
+        	 		$("#parseclass").attr("class","ico-cut");	
+        	 	}
+        	 		
+        	 	document.getElementById("counttext").value=endnum+"公斤及以下";
+        	 	document.getElementById("count").value=endnum;
+        	 	window.localStorage.setItem('counttext',endnum+"公斤及以下");
+        	 	window.localStorage.setItem('count',endnum);
+        	 } 
+
+
+
+        	 function savecache(){
+        		 window.localStorage.setItem("taketim",document.getElementById("taketim").value);
+        		 windowlocalStorage.setItem("taketimstr",document.getElementById("taketimstr").text);
+        		 window.localStorage.setItem("sid",'@sender.getId()');
+        		 window.localStorage.setItem("rid",'@receiver.getId()');
+        		 window.localStorage.setItem('count',document.getElementById("count").value);
+        		 
+        		 window.location.href="/user/nextorder";
+        	 }
+        	//微信分享
+        	 wxshare('@sign.getAppId()','@sign.getTimstr()','@sign.getNostr()','@sign.getSign()','@sign.getSharetitle()','@sign.getSharecontent()','@sign.getShareimg()','@sign.getShareurl()',false);        	 
+        </script> 
+}

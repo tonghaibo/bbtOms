@@ -1,0 +1,33 @@
+@(realname : String)(balance : Integer)(endbalance : Integer)
+@import utils.Dates
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		充值信息
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		    	<h3 class="headline text-yellow"> GOOD!商户账户 <b>@realname</b> 充值金额<b>@balance</b>成功， 余额为<b>@endbalance</b> ，谢谢！</h3>
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+</script>
+}

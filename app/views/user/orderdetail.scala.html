@@ -1,0 +1,207 @@
+@(order:models.order.PostOrder)(postman:models.postman.PostmanUser)(sign:models.wx.WxSign)(openid:String)
+@views.html.usermain {
+<!-- css -->
+<title>棒棒糖生活</title>
+}{
+<!-- content -->
+<div class="container">
+
+            <div class="content content-m-t order-show">                
+
+                <div class="order-state">
+
+                    <em class="fl">快递订单<font class="fontcolor">(个人)</font></em>
+
+                    <span class="fr">@assets.CdnAssets.formatordersta(order.getStatus())</span>
+
+                </div>
+
+                <div class="order-address">
+
+                    <ul class="order-address-info order-address-distance">
+
+                       <li>
+
+                          <p>@order.getAddress()</p>
+
+                          <em>
+
+                            <br>
+
+                            
+
+                          </em>
+
+                       </li>   
+
+                       <li>
+
+                          <p>@order.getReceiveaddress()</p>
+
+                          <em>
+
+                            距收件<br>
+
+                            @(order.getDistance().toDouble/1000)km
+
+                          </em>
+
+                       </li>             
+
+                    </ul>
+
+                    <div class="order-address-ico">
+
+                       <i class="ico-send"></i>
+
+                       <em></em>
+
+                       <i class="ico-income"></i>
+
+                    </div>
+
+                </div>
+
+                <div class="row row-b-t sender">
+
+                   <input class="input" type="text" value="@order.getUsername()" readonly/>
+
+                   <input class="input" type="text" value="@order.getPhone()" readonly/>
+
+               </div>
+
+               <div class="row row-b-t sender">
+
+                   <input class="input" type="text" value="@order.getReceivename()" readonly/>
+
+                   <input class="input" type="text" value="@order.getReceivephone()" readonly/>
+
+               </div>
+
+               <div class="row row-b-t">
+
+                   <label class="fl fontcolor">取件时间：</label>
+
+                   <span class="fr">@if(order.getGettyp()=="1"){立即取件}else{@assets.CdnAssets.formatePosttim(order.getGettime())}</span>
+
+               </div>
+
+               <div class="row row-b-t">
+
+                   <label class="fl">物品名称：</label>
+
+                   <span class="fr">@order.getSubjectname()</span>
+
+               </div>
+
+               <div class="row row-b-t">
+
+                   <label class="fl">备注信息：</label>
+
+                   <span class="fr">@order.getSubjectremark()</span>
+
+               </div>
+
+               <div class="row row-b-t">
+
+                  <label class="fl fontcolor">
+
+                     支付金额：
+
+                  </label>
+
+                  <div class="fr need-freight">
+
+                     <b>@(order.getTotalfee().toDouble/100)</b>元
+
+                   </div>
+
+               </div>
+@if(postman!=null){
+               <div class="order-tel">
+
+                    <em class="fl">联系快递员</em>
+
+                    <span class="fr"><i class="ico-tel"></i>@postman.getPhone()</span>
+
+                </div>
+}
+            </div>
+@if(order.getStatus()<3){
+            <div class="btn-wrap fixed">
+
+               <button class="btn">取消订单</button>
+
+            </div>
+}
+        </div>
+
+        <div class="transparent">
+
+           <div class="pop">
+
+               <div class="pop-info">
+
+                   确认取消订单？               
+
+               </div>
+
+               <div class="pop-btn">
+
+                  <a href="javascript:;" onclick="javascript:$('.transparent').css('display','');">点错了</a>
+
+                  <a href="javascript:;" onclick="cancel()">确认取消</a>
+
+               </div>
+
+            </div> 
+
+        </div>
+        
+}{
+<!-- javascript -->
+<script src="@assets.CdnAssets.urlForAPIPublic("javascripts/count.js")"></script>
+ <script>
+ var counturl = location.href.split('#')[0];
+
+ 	jQuery(function($){
+ 		var url = 'http://chaxun.1616.net/s.php?type=ip&output=json&callback=?&_='+Math.random(); 
+ 		$.getJSON(url, function(data){	
+ 			//添加统计
+ 			addcountwx(data.Ip,counturl,'bbt_samecity','@openid');
+ 		});
+ 	});
+ </script>
+<script>
+
+		   window.onload = function(){
+
+			    $('.btn-wrap').click(function(){
+
+				  $('.transparent').css('display','block'); 
+
+			   })
+
+		   }
+			function cancel(){
+				javascript:$('.transparent').css('display','');
+				$.ajax({
+			         type:"POST",
+			         url:"/user/cancelorder",
+			         data:{orderid:'@order.getId()'},
+			         datatype: "json",//"xml", "html", "script", "json", "jsonp", "text".
+			         beforeSend:function(){},  
+			         success:function(data){ 
+			         		window.location.href="/user/orderdetail?orderid=@order.getId()";
+			          }   ,
+			         complete: function(XMLHttpRequest, textStatus){
+			         },
+			         error: function(){
+			             //_alert("发送失败!");
+			         }        
+			      	});  
+			}
+			//微信分享
+			wxshare('@sign.getAppId()','@sign.getTimstr()','@sign.getNostr()','@sign.getSign()','@sign.getSharetitle()','@sign.getSharecontent()','@sign.getShareimg()','@sign.getShareurl()',false);			
+        </script>
+}

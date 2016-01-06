@@ -1,0 +1,179 @@
+@(id:Long)(appVersion : models.app.AppVersion)(ostypes:Html)
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		APP升级信息<small>@if(id == 0){新建App升级信息}@if(id > 0){修改App升级信息}</small>
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="tab-content" style="height:800px;">
+			<form role="form" action="/app/saveAppVersion" method="post" id="appVersionForm" enctype="multipart/form-data">
+               <input type="hidden" id="id" name="id" value="@id">
+                 <div class="box-body">
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>版本号:</label>
+							<input type="text" class="form-control" id="latestver" name="latestver" value="@if(appVersion==null){}else{@appVersion.getLatestver()}">
+							<p class="help-block" id="latestverP" style="display:none;">请输入版本号</p>
+	                    </div>
+                    </div>
+                 	<div class="row">
+                  		<div class="col-xs-4">
+							<label>平台:</label>
+							<select id="ostype" name="ostype" class="form-control">
+								@ostypes
+							</select>
+							<p class="help-block" id="ostypeP" style="display:none;">请选择平台</p>
+						</div>
+                   </div>
+                    <div class="row">
+                    <div class="col-xs-4">
+						<label>提示标题:</label>
+						<input type="text" class="form-control" id="title" name="title" value="@if(appVersion==null){}else{@appVersion.getTitle()}">
+						<p class="help-block" id="titleP" style="display:none;">请输入标题</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-4">
+							<label>提示文案:</label>
+							<textarea rows="3" id="message" name="message" style="margin: 0px; width: 510px; height: 80px;">@if(appVersion==null){}else{@appVersion.getMessage()}</textarea>
+							<p class="help-block" id="messageP" style="display:none;">请输入提示文案</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+                  		<div class="col-xs-4">
+							<label>提示次数:</label>
+					    	<label for="agent"><input type="radio" name="remindTime" id="remindTimeRadios" value="1"  @if(appVersion!=null && appVersion.getRemindTime()!=null && appVersion.getRemindTime()=="1"){checked} />仅提示一次</label>
+					    	<label for="agent"><input type="radio" name="remindTime" id="remindTimeRadios" value="0"  @if(appVersion!=null && appVersion.getRemindTime()!=null && appVersion.getRemindTime()=="0"){checked} />每次都提示</label>
+					    	<p class="help-block" id="remindTimeP" style="display:none;">请选择提示次数</p>
+					    </div>
+                    </div>
+                    <div class="row">
+                  		<div class="col-xs-4">
+							<label>升级类型:</label>
+					    	<label for="agent"><input type="radio" name="isforced" id="isforcedRadios" value="0"  @if(appVersion!=null && appVersion.getIsforced()!=null && appVersion.getIsforced()=="0"){checked} />普通升级</label>
+					    	<label for="agent"><input type="radio" name="isforced" id="isforcedRadios" value="1"  @if(appVersion!=null && appVersion.getIsforced()!=null && appVersion.getIsforced()=="1"){checked} />强制升级</label>
+					    	<p class="help-block" id="isforcedP" style="display:none;">请选择升级类型</p>
+					    </div>
+                    </div>
+                    <div class="row" id="apkDiv" @if(id == 0||(appVersion!=null && appVersion.getOstype()!=null && appVersion.getOstype()!="1")){style="display: none;"}>
+                  		<div class="col-xs-4">
+							<label>APK文件:</label>
+							<input type="file" name="apkFile" id="apkFile"/>
+					    	<p class="help-block" id="apkP" style="display:none;">请上传APK文件</p>
+					    </div>
+                    </div>
+                    <div class="row" id="urlDiv" @if(appVersion!=null && appVersion.getOstype()!=null && appVersion.getOstype()=="1"){style="display: none;"}>
+	                    <div class="col-xs-4">
+							<label>地址链接:</label>
+							<input type="text" class="form-control" id="url" name="url" value="@if(appVersion==null){}else{@appVersion.getUrl()}">
+							<p class="help-block" id="urlP" style="display:none;">请输入地址链接</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>渠道号:</label>
+							<input type="text" class="form-control" id="marketcode" name="marketcode" value="@if(appVersion==null){}else{@appVersion.getMarketcode()}">
+	                    </div>
+                    </div>
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="saveAppVersionBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+            </div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<script type="text/javascript">
+//保存商品详情
+//提交表单，保存商品信息
+$("#saveAppVersionBtn").click(function(){
+	var flag = true;
+	var latestver = $('input[name="latestver"]').val();
+	var ostype = $('[name="ostype"] option:selected').val();
+	var title = $('[name="title"]').val();
+	var message = $('[name="message"]').val();
+	var remindTime = $('input:radio[name="remindTime"]:checked').val();
+	var isforced = $('input:radio[name="isforced"]:checked').val();
+	var url = $('[name="url"]').val();
+	var marketcode = $('[name="marketcode"]').val();
+ 	console.log(ostype);
+	if(latestver==""){
+		$("#latestverP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#latestverP").attr("style","display:none");
+	}
+	if(ostype==""||ostype=="-1"){
+		$("#ostypeP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#ostypeP").attr("style","display:none");
+	}
+	if(title==""){
+		$("#titleP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#titleP").attr("style","display:none");
+	}
+	if(message==""){
+		$("#messageP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#messageP").attr("style","display:none");
+	}
+	if(remindTime==""||typeof(remindTime) == "undefined"){
+		$("#remindTimeP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#remindTimeP").attr("style","display:none");
+	} 
+	if(isforced==""||typeof(isforced) == "undefined"){
+		$("#isforcedP").attr("style","color:red");
+		flag = false;
+	} else{
+		$("#isforcedP").attr("style","display:none");
+	} 
+	if(ostype=="0"){
+		if(url==""){
+			$("#urlP").attr("style","color:red");
+			flag = false;
+		} else{
+			$("#urlP").attr("style","display:none");
+		}		
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#appVersionForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+//平台类型变更
+$("#ostype").change(function(){
+	var ostype = $('[name="ostype"] option:selected').val();
+	if(ostype=="1"){
+		$("#apkDiv").show();
+		$("#urlDiv").hide();
+	}else{
+		$("#apkDiv").hide();
+		$("#urlDiv").show();
+	}
+}); 
+</script>
+}

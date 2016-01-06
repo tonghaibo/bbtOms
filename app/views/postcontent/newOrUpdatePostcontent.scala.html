@@ -1,0 +1,385 @@
+@(id:Long)(postcontent : models.postcontent.Postcontent)(activeNum:String)(src:String)(postcontentImgList:List[models.postcontent.PostcontentImg])
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		任务信息<small>@if(id == 0){新建任务}@if(id > 0){修改任务}</small>
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<ul class="nav nav-tabs">
+				<li @if(activeNum=="1"){class="active"} @if(src=="5"){style="display:none"}>
+					<a href="#panel-1" data-toggle="tab">任务信息</a>
+				</li>
+				<li @if(activeNum=="2"){class="active"} @if(src!="5"){style="display:none"}>
+					<a href="#panel-2" data-toggle="tab">新闻信息</a>
+				</li>
+				<li @if(activeNum=="3"){class="active"} @if(id == 0){style="display:none"}>
+					<a href="#panel-3" data-toggle="tab">图片信息</a>
+				</li>
+			</ul>
+			<div class="tab-content" style="height:800px;">
+			<div class="tab-pane @if(activeNum=="1"){active}" id="panel-1">
+			<form role="form" action="/postcontent/savePostcontent" method="post" id="postcontentForm">
+                 <div class="box-body">
+                 	<div class="row">
+			            <input type="hidden" id="id" name="id" value="@id">
+                  		<div class="col-xs-4">
+						<label>类型:</label>
+				    	<label for="agent"><input class="radioItem" type="radio" name="typ" id="typsRadios" value="1" @if(id!=0){disabled} @if(postcontent!=null && postcontent.getTyp()!=null && postcontent.getTyp()==1){checked} />日常任务</label>
+				    	<label for="agent"><input class="radioItem" type="radio" name="typ" id="typsRadios" value="2" @if(id!=0){disabled} @if(postcontent!=null && postcontent.getTyp()!=null && postcontent.getTyp()==2){checked} />黄金任务</label>
+				    	<label for="agent"><input class="radioItem" type="radio" name="typ" id="typsRadios" value="3" @if(id!=0){disabled} @if(postcontent!=null && postcontent.getTyp()!=null && postcontent.getTyp()==3){checked} />签到任务</label>
+				    	<label for="agent"><input class="radioItem" type="radio" name="typ" id="typsRadios" value="4" @if(id!=0){disabled} @if(postcontent!=null && postcontent.getTyp()!=null && postcontent.getTyp()==4){checked} />系统消息</label>
+				    	<label for="agent"><input type="radio" name="typnews" id="typsRadiosnews" value="5" @if(id!=0){disabled} @if(postcontent!=null && postcontent.getTyp()!=null && postcontent.getTyp()==5){checked} onclick="checkActivePanelShow();"/>新闻</label>
+				    	<p class="help-block" id="typP" style="display:none;">请选择任务类型</p>
+				    </div>
+                   </div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+							<label>类型名称:</label>
+							<input type="text" class="form-control" id="typname" name="typname" maxlength="17" value="@if(postcontent==null){}else{@postcontent.getTypname()}">
+							<p class="help-block" id="typnameP" style="display:none;">请输入类型名称（不超过17个字）</p>
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+							<label>标题:</label>
+							<input type="text" class="form-control" id="title" name="title" maxlength="30" value="@if(postcontent==null){}else{@postcontent.getTitle()}">
+							<p class="help-block" id="titleP" style="display:none;">请输入任务名称（不超过30个字）</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-3">
+							<label>描述（非必填）:</label>
+							<textarea rows="3" id="content" name="content" style="margin: 0px; width: 370px; height: 80px;">@if(postcontent==null){}else{@postcontent.getContent()}</textarea>
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+							<label for="expectamount">预计收益(非必填)(单位：分):</label>
+							<input type="text" class="form-control" id="expectamount" name="expectamount" maxlength="10" value="@if(postcontent==null){}else{@postcontent.getExpectamount()}" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+							<label for="amount">奖励金额(非必填):</label>
+							<input type="text" class="form-control" id="amount" name="amount" maxlength="10" value="@if(postcontent==null){}else{@postcontent.getAmount()}" >
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+							<label for="linkurl">链接（例：http://bbtoms.ibbt.com/xx/xxx）:</label>
+							<input type="text" class="form-control" id="linkurl" name="linkurl" value="@if(id == 0||postcontent==null){http://bbtoms.ibbt.com}else{@postcontent.getLinkurl()}" placeholder="http://bbtoms.ibbt.com/">
+							<p class="help-block" id="linkurlP" style="display:none;">请输入链接</p>
+	                    </div>
+                    </div>
+                    <div class="row" id="dateremarkdiv">
+	                    <div class="col-xs-3">
+							<label for="dateremark">任务时间描述:</label>
+							<input type="text" class="form-control" id="dateremark" name="dateremark" value="@if(postcontent==null){}else{@postcontent.getDateremark()}">
+	                    </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3" >
+	                    	<label>开始时间</label>
+						    <input id="start_tim" name="start_tim" type="text" class="form-control"  readonly value="@if(postcontent==null){}else{@postcontent.getStart_tim()}"/>
+						    <p class="help-block" id="start_timP" style="display:none;">请选择开始时间</p>
+						</div>
+					</div>
+					<div class="row">
+	                    <div class="col-xs-3" >
+	                    	<label>结束时间</label>
+						    <input id="end_tim" name="end_tim" type="text" class="form-control" readonly value="@if(postcontent==null){}else{@postcontent.getEnd_tim()}"/>
+						    <p class="help-block" id="end_timP" style="display:none;">请选择结束时间</p>
+						</div>
+					</div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+	                      <label for="nsort">排序值</label>
+                     	  <input type="text" class="form-control" id="nsort" name="nsort" maxlength="10" value="@if(postcontent==null){}else{@postcontent.getNsort()}" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+                     	  <p class="help-block" id="nsortP" style="display:none;">请输入排序值</p>
+	                    </div>
+                    </div>
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="savePostcontentBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+            </div>
+            <div class="tab-pane @if(activeNum=="2"){active}" id="panel-2">
+			<form role="form" action="/postcontent/savenewsPostcontent" method="post" id="newspostcontentForm">
+                 <div class="box-body">
+                    <div class="row">
+	                    <div class="col-xs-3">
+	                   		<input type="hidden" id="newsid" name="newsid" value="@id">
+							<label>标题:</label>
+							<input type="text" class="form-control" id="newstitle" name="newstitle" maxlength="30" value="@if(postcontent==null){}else{@postcontent.getTitle()}">
+							<p class="help-block" id="newstitleP" style="display:none;">请输入任务名称（不超过30个字）</p>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                    <div class="col-xs-3">
+							<label>描述（非必填）:</label>
+							<textarea rows="3" id="newscontent" name="newscontent" style="margin: 0px; width: 370px; height: 80px;">@if(postcontent==null){}else{@postcontent.getContent()}</textarea>
+	                    </div>
+                    </div>
+                    <div class="row" >
+	                  <div class="col-xs-12">
+	                      <label for="editor">正文:</label>
+	                      <!--style给定宽度可以影响编辑器的最终宽度-->
+	                      <input type="hidden" id="newcontentDetailVal" name="newcontentDetailVal" value="@if(postcontent!=null&&postcontent.getPostcontentDetail()!=null){@postcontent.getPostcontentDetail().getPccontent()}"/>
+					  	  <script type="text/plain" id="newscontentDetail" name="newscontentDetail"  style="width:900px;height:250px;max-height:600px;"></script>
+                      </div>
+                    </div>
+                    <div class="row">
+	                    <div class="col-xs-3" >
+	                    	<label>开始时间</label>
+						    <input id="newsstart_tim" name="newsstart_tim" type="text" class="form-control"  readonly value="@if(postcontent==null){}else{@postcontent.getStart_tim()}"/>
+						    <p class="help-block" id="newsstart_timP" style="display:none;">请选择开始时间</p>
+						</div>
+					</div>
+					<div class="row">
+	                    <div class="col-xs-3" >
+	                    	<label>结束时间</label>
+						    <input id="newsend_tim" name="newsend_tim" type="text" class="form-control" readonly value="@if(postcontent==null){}else{@postcontent.getEnd_tim()}"/>
+						    <p class="help-block" id="newsend_timP" style="display:none;">请选择结束时间</p>
+						</div>
+					</div>
+                    <div class="row">
+	                    <div class="col-xs-3">
+	                      <label for="nsort">排序值</label>
+                     	  <input type="text" class="form-control" id="newsnsort" name="newsnsort" maxlength="10" value="@if(postcontent==null){}else{@postcontent.getNsort()}" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+                     	  <p class="help-block" id="newsnsortP" style="display:none;">请输入排序值</p>
+	                    </div>
+                    </div>
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="savenewsPostcontentBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+            </div>
+        	<div class="tab-pane @if(activeNum=="3"){active}" id="panel-3">
+        	<!-- 删除商品图片modal start -->
+            <div class="modal fade" id="deleteImage" tabindex="-1" role="dialog" aria-labelledby="deleteImageLabel" aria-hidden="true">
+                <div class="modal_wrapper">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">关闭</span></button>
+                                <h4 class="modal-title" >确认信息</h4>
+                            </div>
+                            <div class="modal-body">确定删除此图片？<br></div>
+                            <div class="modal-footer">
+                            	<input id="imageidDelete" name="imageidDelete" value="" type="hidden"/>
+                                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                                <button id="deleteImageConfirmButton" type="button" class="btn btn-primary">确认</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- 删除商品图片modal end -->
+			<br/>
+            <label for="exampleInputFile"></label>
+            @if(postcontent!=null && postcontentImgList!=null ){
+             <div>
+             @for(postcontentImg <- postcontentImgList){
+             <span id="@postcontentImg.getId()">
+             	<a href="@postcontentImg.getImgurl()" target="blank"><img style="width: 200px;height: 200px;" alt="点击进行预览" src='@Configuration.root().getString("oss.image.url")@postcontentImg.getImgurl()@@200'></a>
+             	<button id="deleteImageButton" class="btn btn-danger" data-toggle="modal" data-target="#deleteImage" onclick="setImageDelete('@postcontentImg.getId()');">删除</button>
+             </span>
+             }
+             </div>
+            }
+            <div class="form-group">
+            	<form enctype="multipart/form-data" action="/postcontent/uploadPostcontentImg" method="post">
+            		<input id="pcidImages" name="pcidImages" value="@id" type="hidden"/>
+             	<input id="postcontentimages" name="postcontentimages" class="file" type="file" multiple data-upload-url="/postcontent/uploadPostcontentImg?pcidImages=@id">
+             </form>
+            </div>
+		 </div>
+		</div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<script type="text/javascript">
+$('#start_tim').datetimepicker({
+	autoclose:true,
+	format:"yyyy-mm-dd hh",
+	todayBtn:true
+}).on('changeDate',function(bv){
+	var btime = $("#start_tim").val();
+	$("#end_tim").datetimepicker('setStartDate',btime);
+	$('#end_tim').datetimepicker('hide');
+});
+$('#end_tim').datetimepicker({
+	autoclose:true,
+	format:"yyyy-mm-dd hh"
+}).on('changeDate',function(ev){
+	var etime = $("#end_tim").val();
+	$("#start_tim").datetimepicker('setEndDate',etime);
+	$('#start_tim').datetimepicker('hide');
+});
+$('#newsstart_tim').datetimepicker({
+	autoclose:true,
+	format:"yyyy-mm-dd hh",
+	todayBtn:true
+}).on('changeDate',function(bv){
+	var newsbtime = $("#newsstart_tim").val();
+	$("#newsend_tim").datetimepicker('setStartDate',newsbtime);
+	$('#newsend_tim').datetimepicker('hide');
+});
+$('#newsend_tim').datetimepicker({
+	autoclose:true,
+	format:"yyyy-mm-dd hh"
+}).on('changeDate',function(ev){
+	var newsetime = $("#newsend_tim").val();
+	$("#newsstart_tim").datetimepicker('setEndDate',newsetime);
+	$('#newsstart_tim').datetimepicker('hide');
+});
+//提交表单，保存商品信息
+$("#savePostcontentBtn").click(function(){
+	var flag = true;
+	var typ = $('[name="typ"]:checked').val();
+	var typname = $('input[name="typname"]').val();
+	var title = $('input[name="title"]').val();
+	var linkurl = $('input[name="linkurl"]').val();
+	var start_tim = $('input[name="start_tim"]').val();
+	var end_tim = $('input[name="end_tim"]').val();
+	var nsort = $('input[name="nsort"]').val();
+	if(typ==""||typeof(typ) == "undefined"){
+		$("#typP").attr("style","color:red");
+		flag = false;
+	}
+	if(typname==""){
+		$("#typnameP").attr("style","color:red");
+		flag = false;
+	}
+	if(title==""){
+		$("#titleP").attr("style","color:red");
+		flag = false;
+	}
+	if(linkurl==""){
+		$("#linkurlP").attr("style","color:red");
+		flag = false;
+	}
+	if(start_tim==""){
+		$("#start_timP").attr("style","color:red");
+		flag = false;
+	}
+	if(end_tim==""){
+		$("#end_timP").attr("style","color:red");
+		flag = false;
+	}
+	if(nsort==""){
+		$("#nsortP").attr("style","color:red");
+		flag = false;
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#postcontentForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+//给删除商品图片设置值
+function setImageDelete(imageid){
+	$('#imageidDelete').val(imageid);
+}
+//删除商品图片确认button
+$('#deleteImageConfirmButton').on('click', deleteImageConfirm);
+//删除商品图片
+function deleteImageConfirm(){
+	var imageidDelete=$('#imageidDelete').val();
+	$.ajax({
+        url: '/postcontent/deletePostcontentImg/' +imageidDelete ,
+        type: 'GET',
+        cache: false,
+        dataType: "json",
+        data: {},
+        success: function(json){
+            if(json){
+            	$('#'+imageidDelete).remove();
+            	$("#deleteImage").modal('hide');
+            }else{
+                alert('服务器繁忙，请稍后再试！');
+            }
+        },
+        error: function(){
+            alert('服务器繁忙，请稍后再试！');
+        }
+    });
+}
+//实例化编辑器
+var um = UM.getEditor('newscontentDetail');
+um.setContent($("#newcontentDetailVal").val());
+//保存商品详情
+//提交表单，保存商品信息
+$("#savenewsPostcontentBtn").click(function(){
+	var flag = true;
+	var newstitle = $('input[name="newstitle"]').val();
+	var newsstart_tim = $('input[name="newsstart_tim"]').val();
+	var newsend_tim = $('input[name="newsend_tim"]').val();
+	var newsnsort = $('input[name="newsnsort"]').val();
+	if(newstitle==""){
+		$("#newstitleP").attr("style","color:red");
+		flag = false;
+	}
+	if(newsstart_tim==""){
+		$("#newsstart_timP").attr("style","color:red");
+		flag = false;
+	}
+	if(newsend_tim==""){
+		$("#newsend_timP").attr("style","color:red");
+		flag = false;
+	}
+	if(newsnsort==""){
+		$("#newsnsortP").attr("style","color:red");
+		flag = false;
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#newspostcontentForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+
+//针对新闻类型的信息，改变类型获取的内容
+function checkActivePanelShow(){
+	window.location.href="/postcontent/newOrUpdatePostcontent?activeNum=2&src=5";
+}
+
+//类型选择事件
+$(".radioItem").change(function(){
+	var selectedval = $("input[name='typ']:checked").val();
+	if(selectedval==4){
+		$("#dateremarkdiv").hide();
+	}else{
+		$("#dateremarkdiv").show();
+	}
+	if(selectedval==3){
+		$("#linkurl").val("http://bbtoms.ibbt.com/H5/fanpai");
+	}else{
+		$("#linkurl").val("http://bbtoms.ibbt.com");
+	}
+})
+
+</script>
+}

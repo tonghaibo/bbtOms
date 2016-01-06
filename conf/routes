@@ -1,0 +1,27 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+GET         /                    controllers.Application.index()
+GET         /welcome             controllers.Application.welcome()
+POST        /imgUpload           controllers.Application.imgUpload()
+# Map static resources from the /public folder to the /assets URL path
+GET         /public/*file        controllers.Assets.versioned(path="/public", file: Asset)
+
+# sub routes
+->          /admin               admin.Routes
+#->          /H5                  H5.Routes
+->          /postcontent         postcontent.Routes
+->          /postmanuser         postmanuser.Routes
+->          /balance             balance.Routes
+->			/wx					 wx.Routes
+->			/user				 user.Routes
+# app
+->          /app             	 app.Routes
+
+# statistics
+->          /statistics          statistics.Routes
+
+#postH5
+->          /post	 	         post.Routes

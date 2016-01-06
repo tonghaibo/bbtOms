@@ -1,0 +1,184 @@
+@(appVersionPage : com.avaje.ebean.PagedList[models.app.AppVersion])
+@import utils.Dates
+@import play.Configuration
+@import utils.Constants.AppVersionOstypes
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		APP升级管理
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchappVersionForm" name="searchappVersionForm">
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 10px;" type="button" onclick="javascript:window.location.href='/app/newOrUpdateAppVersion'">+ 新建</button>
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="appVersionTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+	                    <th>ID</th>
+                        <th>版本号</th>
+                        <th>平台</th>
+                        <th>标题</th>
+                        <th>提示次数</th>
+                        <th>升级类型</th>
+                        <th>地址</th>
+                        <th>创建时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if(appVersionPage!=null && appVersionPage.getList() != null && appVersionPage.getList().size() > 0){
+                	@for(appVersion <- appVersionPage.getList()){
+                    <tr class="h6" data-uid="@appVersion.getId()">
+                        <td>@appVersion.getId()</td>
+                        <td>@appVersion.getLatestver()</td>
+                        <td>@AppVersionOstypes.typs2Message(appVersion.getOstype().toInt)</td>
+                        <td>@appVersion.getTitle()</td>
+                        <td>@if(appVersion.getRemindTime()=="1"){仅提示一次}@if(appVersion.getRemindTime()=="0"){每次都提示}</td>
+                        <td>@if(appVersion.getIsforced()=="0"){普通升级}@if(appVersion.getIsforced()=="1"){强制升级}</td>
+                        <td>@appVersion.getUrl()</td>
+                        <td>@Dates.formatDateTime(appVersion.getDateNew())</td>
+                        <td>@if(appVersion.getSta=="3"){有效} @if(appVersion.getSta()!="3"){无效}</td>
+                        <td>
+                        	<a class="btn btn-info" href="/app/newOrUpdateAppVersion?id=@appVersion.getId()" >修改</a> 
+                          @if(appVersion.getSta()!=null&&appVersion.getSta()=="3"){
+                       		<a class="btn btn-warning" href="javascript:void(0);" onclick="changeAppVersionSta(@appVersion.getId(),1)">失效</a> 
+                          }
+                          @if(appVersion.getSta()!=null&&appVersion.getSta()!="3"){
+                       		<a class="btn btn-success" href="javascript:void(0);" onclick="changeAppVersionSta(@appVersion.getId(),3)">激活</a> 
+                          }
+                        </td>
+                    </tr>
+                    }
+                }else{
+                    <tr><td class="text-center" colspan="9">没有可用数据</td></tr>
+                }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(appVersionPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    appVersionPage.getPageIndex() + 1
+		                }/@appVersionPage.getTotalPageCount() 共计@appVersionPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(appVersionPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (appVersionPage.getTotalPageCount()-1)){
+                	@if(appVersionPage.getTotalPageCount()< 8){
+                		<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(appVersionPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == appVersionPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == appVersionPage.getTotalPageCount()-1){
+			               			<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(appVersionPage.getPageIndex() < appVersionPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > appVersionPage.getPageIndex()-4 &&  index < appVersionPage.getPageIndex() +5){
+							 		<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == appVersionPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == appVersionPage.getTotalPageCount()){
+				                		<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > appVersionPage.getTotalPageCount()-8){
+									<li class="@if(index == appVersionPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(appVersionPage.getPageIndex()==appVersionPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{appVersionPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+function changeAppVersionSta(id, sta){
+	if(sta==3){
+		var staStr = confirm("请再次确认对此App升级进行激活处理！");
+		
+		if(staStr == true){
+			console.log("succeful , change sta 3");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消激活App升级操作");
+			return false;
+		}	
+	}else if(sta==1){
+		var staStr = confirm("请再次确认对此App升级进行失效处理！");
+		if(staStr == true){
+			console.log("succeful , change sta 1");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消失效App升级操作");
+			return false;
+		}	
+	}
+}
+</script>
+}

@@ -1,0 +1,174 @@
+@(userAddressPage : com.avaje.ebean.PagedList[models.user.UserAddress])
+@import utils.Dates
+@import play.Configuration
+@import utils.Constants.UserAddressTyps
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		寄件信息管理
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchUserAddressForm" name="searchUserAddressForm">
+			  <div >
+               	<button class="btn btn-primary" style="margin-top:10px;margin-left: 10px;" type="button" onclick="javascript:window.location.href='/post/newOrUpdateUserAddress'">+ 新建</button>
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="userAddressTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>类型</th>
+                        <th>姓名</th>
+                        <th>手机号</th>
+                        <th>地址</th>
+                        <th>地址坐标</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if(userAddressPage!=null && userAddressPage.getList() != null && userAddressPage.getList().size() > 0){
+                	@for(userAddress <- userAddressPage.getList()){
+                    <tr class="h6" data-uid="@userAddress.getId()">
+                        <td>@UserAddressTyps.typs2Message(userAddress.getTyp())</td>
+                        <td>@userAddress.getUsername()</td>
+                        <td>@userAddress.getPhone()</td>
+                        <td>@userAddress.getAddress()</td>
+                        <td>@userAddress.getLongs(),@userAddress.getLat()</td>
+                        <td>@Dates.formatDateTime(userAddress.getDate_new())</td>
+                        <td>
+                        	<a class="btn btn-small btn-info" href="/post/newOrUpdateUserAddress?id=@userAddress.getId()" >修改</a> 
+                        	<button class="btn btn-small btn-danger" onclick="{if(confirm('确定删除此用户信息')){window.location='/post/delUserAddress?id=@userAddress.getId()';return true;}return false;}">删除</button>
+                        </td>
+                    </tr>
+                    }
+                }else{
+                    <tr><td class="text-center" colspan="8">没有可用数据</td></tr>
+                }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(userAddressPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    userAddressPage.getPageIndex() + 1
+		                }/@userAddressPage.getTotalPageCount() 共计@userAddressPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(userAddressPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (userAddressPage.getTotalPageCount()-1)){
+                	@if(userAddressPage.getTotalPageCount()< 8){
+                		<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(userAddressPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == userAddressPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == userAddressPage.getTotalPageCount()-1){
+			               			<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(userAddressPage.getPageIndex() < userAddressPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > userAddressPage.getPageIndex()-4 &&  index < userAddressPage.getPageIndex() +5){
+							 		<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == userAddressPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == userAddressPage.getTotalPageCount()){
+				                		<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > userAddressPage.getTotalPageCount()-8){
+									<li class="@if(index == userAddressPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(userAddressPage.getPageIndex()==userAddressPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{userAddressPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+function changeUserAddressSta(id, sta){
+	if(sta==3){
+		var staStr = confirm("请再次确认对此App升级进行激活处理！");
+		
+		if(staStr == true){
+			console.log("succeful , change sta 3");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消激活App升级操作");
+			return false;
+		}	
+	}else if(sta==1){
+		var staStr = confirm("请再次确认对此App升级进行失效处理！");
+		if(staStr == true){
+			console.log("succeful , change sta 1");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消失效App升级操作");
+			return false;
+		}	
+	}
+}
+
+</script>
+}

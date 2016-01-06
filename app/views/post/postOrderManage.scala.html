@@ -1,0 +1,229 @@
+@(postOrderPage : com.avaje.ebean.PagedList[models.order.PostOrder])(ordertyps:Html)(statuses:Html)(formPage:form.PostOrderForm)
+@import utils.Dates
+@import utils.Constants.CityWideDeliverStas
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		同城订单管理
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchpostOrderForm" name="searchpostOrderForm">
+			  	<div class="row">
+	                <div class="col-xs-3">
+	                  <label>订单类型：</label>
+	                  <select id="ordertyp" name="ordertyp" class="form-control">
+	                  	@ordertyps
+	                  </select>
+	                </div>
+	                <div class="col-xs-3">
+	                  <label>状态：</label>
+	                  <select id="status" name="status" class="form-control">
+	                  	@statuses
+	                  </select>
+	                </div>
+	                <div class="col-xs-3">
+	                  <label>生成时间：</label>
+	                   <input id="between" name="between" type="text" class="form-control" placeholder="请选择下单时间" readonly value="@formPage.between"/>
+	                </div>
+	            </div>
+	            <div class="row">
+	                <div class="col-xs-3">
+	                  <label>订单号：</label>
+	                  <input id="ordercode" name="ordercode" type="text" class="form-control" placeholder="请输入订单号" value="@formPage.ordercode"/>
+	                </div>
+	                <div class="col-xs-3">
+	                  <label>关键字：</label>
+	                  <input id="keyword" name="keyword" type="text" class="form-control" placeholder="寄件人/收件人/手机号" value="@formPage.keyword"/>
+	                </div>
+	            </div>
+			  	<div >
+			  	 	<button class="btn btn-primary" style="margin-top:10px;margin-left: 10px;" type="submit">搜索</button>
+	              	<button class="btn btn-primary" style="margin-top:10px;margin-left: 10px;" type="button" onclick="javascript:window.location.href='/post/newOrUpdatePostOrder'">+ 新建</button>
+	            </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="postOrderTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>订单号</th>
+                        <th>寄件人</th>
+                        <th>寄件手机</th>
+                        <th>寄件地址</th>
+                        <th>收件人</th>
+                        <th>收件手机</th>
+                        <th>收件地址</th>
+                        <th>重量</th>
+                        <th>总价</th>
+                        <th>生成时间</th>
+                        <th>更新时间</th>
+                        <th>状态</th>
+                        <th>操作</th>
+                </thead>
+                <tbody>
+                @if(postOrderPage!=null && postOrderPage.getList() != null && postOrderPage.getList().size() > 0){
+                	@for(postOrder <- postOrderPage.getList()){
+                    <tr class="h6" data-uid="@postOrder.getId()">
+                        <td>@postOrder.getOrdercode()</td>
+                        <td>@postOrder.getUsername()</td>
+                        <td>@postOrder.getPhone()</td>
+                        <td>@postOrder.getAddress()</td>
+                        <td>@postOrder.getReceivename()</td>
+                        <td>@postOrder.getReceivephone()</td>
+                        <td>@postOrder.getReceiveaddress()</td>
+                        <td>@postOrder.getWeight()</td>
+                        <td>@postOrder.getTotalfee()</td>
+                        <td>@Dates.formatDateTime(postOrder.getDate_new())</td>
+                        <td>@Dates.formatDateTime(postOrder.getDate_upd())</td>
+                        <td>@CityWideDeliverStas.stas2Message(postOrder.getStatus())</td>
+                        <td>
+                        	<!-- <a class="btn btn-small btn-info" href="/post/newOrUpdatepostOrder?id=@postOrder.getId()" >修改</a>  -->
+                        	<!-- <button style="display: none;" disabled="disabled" class="btn btn-small btn-danger" onclick="{if(confirm('确定删除此订单信息')){window.location='/post/delPostOrder?id=@postOrder.getId()';return true;}return false;}">删除</button> -->
+                        	@if(postOrder.getStatus()==1||postOrder.getStatus()==2){
+                        		<button class="btn btn-small btn-warning" onclick="{if(confirm('确定取消此订单信息')){window.location='/post/cancelPostOrder?id=@postOrder.getId()';return true;}return false;}">取消订单</button>
+                        	}
+                        </td>
+                    </tr>
+                    }
+                }else{
+                    <tr><td class="text-center" colspan="8">没有可用数据</td></tr>
+                }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(postOrderPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    postOrderPage.getPageIndex() + 1
+		                }/@postOrderPage.getTotalPageCount() 共计@postOrderPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(postOrderPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (postOrderPage.getTotalPageCount()-1)){
+                	@if(postOrderPage.getTotalPageCount()< 8){
+                		<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(postOrderPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == postOrderPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == postOrderPage.getTotalPageCount()-1){
+			               			<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(postOrderPage.getPageIndex() < postOrderPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > postOrderPage.getPageIndex()-4 &&  index < postOrderPage.getPageIndex() +5){
+							 		<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == postOrderPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == postOrderPage.getTotalPageCount()){
+				                		<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > postOrderPage.getTotalPageCount()-8){
+									<li class="@if(index == postOrderPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(postOrderPage.getPageIndex()==postOrderPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{postOrderPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+$("#between").daterangepicker({
+    locale: {
+        applyLabel: '确定',
+        cancelLabel: '取消',
+        fromLabel: '开始',
+        toLabel: '结束',
+        weekLabel: 'W',
+        customRangeLabel: 'Custom Range',
+        showDropdowns: true
+    },
+    format: 'YYYY/MM/DD'
+});
+function changepostOrderSta(id, sta){
+	if(sta==3){
+		var staStr = confirm("请再次确认对此App升级进行激活处理！");
+		
+		if(staStr == true){
+			console.log("succeful , change sta 3");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消激活App升级操作");
+			return false;
+		}	
+	}else if(sta==1){
+		var staStr = confirm("请再次确认对此App升级进行失效处理！");
+		if(staStr == true){
+			console.log("succeful , change sta 1");
+			window.location.href="/app/changeAppVersionSta?id="+id+"&sta="+sta;
+		}else{
+			console.log("用户取消失效App升级操作");
+			return false;
+		}	
+	}
+}
+
+</script>
+}

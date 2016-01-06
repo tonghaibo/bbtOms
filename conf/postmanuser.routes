@@ -1,0 +1,7 @@
+GET    /postmanUserManage           			controllers.postmanuser.PostmanUserController.postmanUserManage()
+GET    /changePostmanUserSta           			controllers.postmanuser.PostmanUserController.changePostmanUserSta()
+GET    /newOrUpdatePostmanUser           		controllers.postmanuser.PostmanUserController.newOrUpdatePostmanUser()
+POST   /savePostmanUser           				controllers.postmanuser.PostmanUserController.savePostmanUser()
+GET    /piliangChangePostmanUserSta           	controllers.postmanuser.PostmanUserController.piliangChangePostmanUserSta()
+GET    /userLocation/:uid           	controllers.postmanuser.PostmanUserController.userLocation(uid:Int)
+GET    /userLocationData/:uid           	controllers.postmanuser.PostmanUserController.userLocationData(uid:Int)

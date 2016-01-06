@@ -1,0 +1,143 @@
+@(userBalanceLogPage : com.avaje.ebean.PagedList[models.user.UserBalanceLog])
+@import utils.Dates
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		账户充值信息
+	</h1>
+	
+</section>
+
+<!-- Main content -->
+<section class="content">
+	<div class="col-xs-12">
+         <div class="box box-warning">
+           <div class="box-header">
+           </div><!-- /.box-header -->
+           <div class="box-body">
+            <form action="?" method="get" id="searchUserBalanceLogForm" name="searchUserBalanceLogForm">
+			  <div >
+             </div>
+             </div>
+           </form>
+         </div><!-- /.box-body -->
+       </div><!-- /.box -->
+     </div><!--col-xs-12 end 创建任务 -->
+	<!-- Main row -->
+	<div class="col-xs-12">
+		<div class="box">
+		    <div class="box-header">
+		    </div>
+		    <div class="box-body table-responsive">
+		        <table id="userBalanceLogTable" class="table table-bordered table-hover">
+                <thead>
+                    <tr>
+                        <th>商家</th>
+                        <th>充值前余额</th>
+                        <th>账户余额</th>
+                        <th>充值金额</th>
+                        <th>充值时间</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @if(userBalanceLogPage!=null && userBalanceLogPage.getList() != null && userBalanceLogPage.getList().size() > 0){
+                	@for(userBalanceLog <- userBalanceLogPage.getList()){
+                    <tr class="h6" data-uid="@userBalanceLog.getId()">
+                        <td>@userBalanceLog.getUid()</td>
+                        <td>@userBalanceLog.getBeforebalance()</td>
+                        <td>@userBalanceLog.getEndbalance()</td>
+                        <td>@userBalanceLog.getChangemoney()</td>
+                        <td>@Dates.formatDateTime(userBalanceLog.getDate_new())</td>
+                    </tr>
+                    }
+                }else{
+                    <tr><td class="text-center" colspan="5">没有可用数据</td></tr>
+                }
+                </tbody>
+                <tfoot>
+                </tfoot>
+           		</table>
+           		@if(userBalanceLogPage.getTotalPageCount()>0) {
+		        <div>
+		            <div class="col-xs-6">
+		                <div class="dataTables_info" id="userTable_info">页码：@{
+		                    userBalanceLogPage.getPageIndex() + 1
+		                }/@userBalanceLogPage.getTotalPageCount() 共计@userBalanceLogPage.getTotalRowCount()条记录</div>
+		            </div>
+		            <div >
+		                <div class="dataTables_paginate paging_bootstrap">
+		                    <ul class="pagination">
+		                    
+		                     @if(userBalanceLogPage.getPageIndex()<1){
+                   					<li class="prev disabled"><a href="javascript:">首页</a></li>
+			               	}else{
+			               		<li class="prev"><a href="@searchParam()page=0">首页</a></li>
+			               	}
+			               	
+                @for(index<- 0 to (userBalanceLogPage.getTotalPageCount()-1)){
+                	@if(userBalanceLogPage.getTotalPageCount()< 8){
+                		<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+                  	}else{
+                       	@if(userBalanceLogPage.getPageIndex()<7) {
+							@if(index < 8){
+								<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							}else{
+								@if(index == userBalanceLogPage.getTotalPageCount()-1){
+									<li class=""><a href="javascript:">...</a></li>
+		                		}
+			               		@if(index == userBalanceLogPage.getTotalPageCount()-1){
+			               			<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+		                		}
+							}
+						}else{	
+							@if(userBalanceLogPage.getPageIndex() < userBalanceLogPage.getTotalPageCount()-4){
+							 	@if(index==0 || index > userBalanceLogPage.getPageIndex()-4 &&  index < userBalanceLogPage.getPageIndex() +5){
+							 		<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+								}else{
+									@if(index == 2){
+							 			<li class=""><a href="javascript:">...</a></li>
+									}
+									@if(index == userBalanceLogPage.getTotalPageCount()-1){
+				                		<li class=""><a href="javascript:">...</a></li>
+			                		}
+				               		@if(index == userBalanceLogPage.getTotalPageCount()){
+				                		<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+			                		}
+								}
+							}else{
+								@if(index==0 || index > userBalanceLogPage.getTotalPageCount()-8){
+									<li class="@if(index == userBalanceLogPage.getPageIndex()){active}"><a href="@searchParam()page=@index">@(index+1)</a></li>
+							   		}else{
+							   			@if(index==2){
+							   				<li class=""><a href="javascript:">...</a></li>
+							   			}
+							   		}
+							   	}
+			  				 }
+						}  
+                      }
+                      @if(userBalanceLogPage.getPageIndex()==userBalanceLogPage.getTotalPageCount()){
+                      	<li class="next disabled"><a href="javascript:">尾页</a></li>
+                      }else{
+                      	<li class="next"><a href="@searchParam()page=@{userBalanceLogPage.getTotalPageCount()-1}">尾页</a></li>
+                      }
+		                    </ul>
+		                </div>
+		            </div>
+		        </div>
+		        }
+		    </div>
+		</div>
+	</div>
+	<!-- /.row (main row) -->
+
+</section>
+}{
+<script type="text/javascript">
+
+</script>
+}

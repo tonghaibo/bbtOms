@@ -1,0 +1,50 @@
+@()@searchParam() = @{
+    var href = "?"
+    var sta = request().getQueryString("sta")
+    var nickname = request().getQueryString("nickname")
+    var phone = request().getQueryString("phone")
+    var alipayAccount = request().getQueryString("alipayAccount")
+    var keyword = request().getQueryString("keyword")
+    var between = request().getQueryString("between")
+    
+    if(sta != "" && sta != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "sta=" + sta
+    }
+    if(nickname != "" && nickname != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "nickname=" + nickname
+    }
+    if(phone != "" && phone != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "phone=" + phone
+    }
+    if(alipayAccount != "" && alipayAccount != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "alipayAccount=" + alipayAccount
+    }
+    if(keyword != "" && keyword != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "keyword=" + keyword
+    }
+    if(between != "" && between != null){
+        if(href != "?"){
+            href += "&"
+        }
+        href += "between=" + between
+    }
+    if(href != "?"){
+        href += "&"
+    }
+    href
+}@searchParam()

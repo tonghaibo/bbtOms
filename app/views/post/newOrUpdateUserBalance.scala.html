@@ -1,0 +1,79 @@
+@(realnames : Html)
+@import play.Configuration
+@views.html.main {
+<!-- css -->
+}{
+<!-- Content Header (Page header) -->
+<section class="content-header">
+	<h1>
+		商户账户充值
+	</h1>
+</section>
+
+<!-- Main content -->
+<section class="content">
+<div class="container-fluid">
+	<div class="row-fluid">
+		<div class="span12">
+			<div class="tab-content" style="height:800px;">
+			<form role="form" action="/post/saveUserBalance" method="post" id="userBalanceForm" >
+                 <div class="box-body">
+                 	<div class="row">
+                  		<div class="col-xs-4">
+							<label>商户名称:</label>
+							<select id="adminId" name="adminId" class="form-control">
+								@realnames
+							</select>
+							<p class="help-block" id="adminIdP" style="display:none;">请选择商户名称</p>
+						</div>
+                   </div>
+                    <div class="row">
+	                    <div class="col-xs-4">
+							<label>充值金额:</label>
+							<input type="text" class="form-control" id="balance" name="balance" onkeyup ="this.value=this.value.replace(/[^\d]/g,'')" onblur="this.value=this.value.replace(/[^\d]/g,'')">
+							<p class="help-block" id="balanceP" style="display:none;">请输入充值金额</p>
+	                    </div>
+                    </div>
+                    
+                 </div><!-- /.box-body -->
+
+                 <div class="box-footer">
+                   <button type="button" class="btn btn-primary" id="saveUserBalanceBtn">保存</button>
+                   <button class="btn btn-primary" type="button" onclick="history.go(-1)">返回</button>
+                 </div>
+               </form>
+            </div>
+		</div>
+	</div>
+</div>
+</section>
+}{
+<script type="text/javascript">
+//保存地址详情
+//提交表单，保存商品信息
+$("#saveUserBalanceBtn").click(function(){
+	var flag = true;
+	var adminId = $('[name="adminId"] option:selected').val();
+	var balance = $('[name="balance"]').val();
+	if(adminId==""||typeof(adminId)=='undefined'||adminId==-1){
+		$("#adminIdP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#adminIdP").attr("style","display:none");
+	}
+	if(balance==""||balance=="-1"){
+		$("#balanceP").attr("style","color:red");
+		flag = false;
+	}else{
+		$("#balanceP").attr("style","display:none");
+	}
+	if(flag){
+		console.log("succeful , submit");
+		$("#userBalanceForm").submit();
+	}else{
+		alert("有非法内容，请检查内容合法性！");
+		return false;
+	}
+})
+</script>
+}
